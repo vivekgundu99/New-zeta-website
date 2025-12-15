@@ -1,5 +1,3 @@
-const authToken = localStorage.getItem('token');
-
 // Admin Dashboard Functions
 function setupAdminListeners() {
     // Admin Tabs
