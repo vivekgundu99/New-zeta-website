@@ -303,7 +303,7 @@ function renderQuizQuestion(question, userAnswer, type) {
     const answered = userAnswer !== null;
     const isCorrect = answered && userAnswer === question.correctOption;
     
-    let html = '<div class="quiz-question">';
+    let html = `<div class="quiz-question" data-id="${question._id}">`;
     html += `<p class="question-text">${question.question}</p>`;
     html += '<div class="options-container">';
     
@@ -350,27 +350,32 @@ async function answerQuestion(questionId, answer, type) {
         });
 
         if (response.ok) {
-            if (type === 'daily') {
-                await loadDailyQuiz();
-            } else if (type === 'competitive') {
-                // Re-render the questions for the current topic
-                const topicNameElem = document.querySelector('#questionsContainer h4');
-                const topicName = topicNameElem ? topicNameElem.textContent : '';
-                const topicId = document.querySelector('.back-to-topics')?.dataset.topicId;
+            // Get the evaluated answer from backend
+            const data = await response.json(); // data.correctOption
 
-                if (topicId && topicName) {
-                    await loadTopicQuestions(topicId, topicName);
-                } else {
-                    // fallback: just reload topics list
-                    backToTopics();
-                }
+            // Find the question container
+            const questionDiv = document.querySelector(`.quiz-question[data-id='${questionId}']`);
+            if (questionDiv) {
+                // Mark all option buttons as disabled and color correct/wrong
+                const optionButtons = questionDiv.querySelectorAll('.option-btn');
+                optionButtons.forEach(btn => {
+                    const btnLetter = btn.textContent.trim().charAt(0); // A, B, C, D
+                    btn.disabled = true;
+                    if (btnLetter === data.correctOption) btn.classList.add('correct');
+                    else if (btnLetter === answer) btn.classList.add('wrong');
+                });
+
+                // Show result message
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `quiz-result ${data.correctOption === answer ? 'correct' : 'wrong'}`;
+                resultDiv.textContent = data.correctOption === answer ? 'Your answer is correct! ✓' : 'Your answer is wrong ✗';
+                questionDiv.appendChild(resultDiv);
             }
         }
     } catch (error) {
         console.error('Error submitting answer:', error);
     }
 }
-
 window.answerQuestion = answerQuestion;
 
 
