@@ -1,5 +1,3 @@
-const API_URL = 'https://zeta-website.onrender.com/api';
-
 // Theme Management
 const themeToggle = document.getElementById('themeToggle');
 const body = document.body;

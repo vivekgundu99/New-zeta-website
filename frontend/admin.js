@@ -1,4 +1,3 @@
-const API_URL = 'https://zeta-website.onrender.com/api';
 const authToken = localStorage.getItem('token');
 
 // Admin Dashboard Functions

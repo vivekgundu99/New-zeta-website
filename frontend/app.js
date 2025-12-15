@@ -1,5 +1,3 @@
-const API_URL = 'https://zeta-website.onrender.com/api';
-
 let currentUser = null;
 let authToken = null;
 
