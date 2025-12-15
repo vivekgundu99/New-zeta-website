@@ -1,3 +1,5 @@
+const API_URL = 'http://localhost:5000/api';
+
 // Admin Dashboard Functions
 function setupAdminListeners() {
     // Admin Tabs
@@ -42,7 +44,46 @@ async function loadAdminData() {
     await loadAdminHelp();
 }
 
-// Daily Quiz Admin
+// Helper function to render admin item
+function renderAdminItem(content, editCallback, deleteCallback, id) {
+    return `
+        <div class="admin-item">
+            <div class="admin-item-content">${content}</div>
+            <div class="admin-item-actions">
+                <button class="edit-btn" onclick="${editCallback}('${id}')">Edit</button>
+                <button class="delete-btn" onclick="${deleteCallback}('${id}')">Delete</button>
+            </div>
+        </div>
+    `;
+}
+
+// Helper function to create form
+function createForm(fields, submitCallback, cancelCallback) {
+    let html = '<div class="admin-item"><form style="width: 100%;">';
+    
+    fields.forEach(field => {
+        html += `
+            <div class="form-group">
+                <label>${field.label}</label>
+                ${field.type === 'textarea' 
+                    ? `<textarea id="${field.id}" rows="${field.rows || 3}" style="width: 100%; padding: 12px; border: 2px solid var(--border-light); border-radius: 8px;" ${field.required ? 'required' : ''}>${field.value || ''}</textarea>`
+                    : field.type === 'select'
+                    ? `<select id="${field.id}" ${field.required ? 'required' : ''}>${field.options.map(opt => `<option value="${opt.value}" ${field.value === opt.value ? 'selected' : ''}>${opt.text}</option>`).join('')}</select>`
+                    : `<input type="${field.type || 'text'}" id="${field.id}" value="${field.value || ''}" ${field.required ? 'required' : ''}>`
+                }
+            </div>
+        `;
+    });
+    
+    html += `
+        <button type="submit" class="btn-primary">${fields.submitText || 'Submit'}</button>
+        <button type="button" class="btn-secondary" onclick="${cancelCallback}()">Cancel</button>
+    </form></div>`;
+    
+    return html;
+}
+
+// ===== DAILY QUIZ MANAGEMENT =====
 async function loadAdminDailyQuiz() {
     try {
         const response = await fetch(`${API_URL}/quiz/daily`, {
@@ -53,22 +94,17 @@ async function loadAdminDailyQuiz() {
         const container = document.getElementById('dailyQuizList');
         
         if (response.ok && data) {
-            container.innerHTML = `
-                <div class="admin-item">
-                    <div class="admin-item-content">
-                        <strong>${data.question}</strong><br>
-                        A: ${data.optionA}<br>
-                        B: ${data.optionB}<br>
-                        C: ${data.optionC}<br>
-                        D: ${data.optionD}<br>
-                        <em>Correct: ${data.correctOption}</em>
-                    </div>
-                    <div class="admin-item-actions">
-                        <button class="edit-btn" onclick="editDailyQuiz('${data._id}')">Edit</button>
-                        <button class="delete-btn" onclick="deleteDailyQuiz('${data._id}')">Delete</button>
-                    </div>
-                </div>
-            `;
+            container.innerHTML = renderAdminItem(
+                `<strong>${data.question}</strong><br>
+                A: ${data.optionA}<br>
+                B: ${data.optionB}<br>
+                C: ${data.optionC}<br>
+                D: ${data.optionD}<br>
+                <em>Correct: ${data.correctOption}</em>`,
+                'editDailyQuiz',
+                'deleteDailyQuiz',
+                data._id
+            );
         } else {
             container.innerHTML = '<p class="empty-message">No daily quiz</p>';
         }
@@ -78,47 +114,30 @@ async function loadAdminDailyQuiz() {
 }
 
 function showAddDailyQuizForm() {
-    const form = `
-        <div class="admin-item">
-            <form id="dailyQuizForm" style="width: 100%;">
-                <div class="form-group">
-                    <label>Question</label>
-                    <input type="text" id="dqQuestion" required>
-                </div>
-                <div class="form-group">
-                    <label>Option A</label>
-                    <input type="text" id="dqOptionA" required>
-                </div>
-                <div class="form-group">
-                    <label>Option B</label>
-                    <input type="text" id="dqOptionB" required>
-                </div>
-                <div class="form-group">
-                    <label>Option C</label>
-                    <input type="text" id="dqOptionC" required>
-                </div>
-                <div class="form-group">
-                    <label>Option D</label>
-                    <input type="text" id="dqOptionD" required>
-                </div>
-                <div class="form-group">
-                    <label>Correct Option</label>
-                    <select id="dqCorrect" required>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary">Add Daily Quiz</button>
-                <button type="button" class="btn-secondary" onclick="loadAdminDailyQuiz()">Cancel</button>
-            </form>
-        </div>
-    `;
+    const form = createForm([
+        { id: 'dqQuestion', label: 'Question', required: true },
+        { id: 'dqOptionA', label: 'Option A', required: true },
+        { id: 'dqOptionB', label: 'Option B', required: true },
+        { id: 'dqOptionC', label: 'Option C', required: true },
+        { id: 'dqOptionD', label: 'Option D', required: true },
+        { 
+            id: 'dqCorrect', 
+            label: 'Correct Option', 
+            type: 'select',
+            options: [
+                { value: 'A', text: 'A' },
+                { value: 'B', text: 'B' },
+                { value: 'C', text: 'C' },
+                { value: 'D', text: 'D' }
+            ],
+            required: true 
+        }
+    ], null, 'loadAdminDailyQuiz');
     
+    form.submitText = 'Add Daily Quiz';
     document.getElementById('dailyQuizList').innerHTML = form;
     
-    document.getElementById('dailyQuizForm').addEventListener('submit', async (e) => {
+    document.querySelector('#dailyQuizList form').addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const quizData = {
@@ -162,47 +181,30 @@ window.editDailyQuiz = async function(id) {
         });
         const data = await response.json();
 
-        const form = `
-            <div class="admin-item">
-                <form id="editDailyQuizForm" style="width: 100%;">
-                    <div class="form-group">
-                        <label>Question</label>
-                        <input type="text" id="edqQuestion" value="${data.question}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Option A</label>
-                        <input type="text" id="edqOptionA" value="${data.optionA}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Option B</label>
-                        <input type="text" id="edqOptionB" value="${data.optionB}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Option C</label>
-                        <input type="text" id="edqOptionC" value="${data.optionC}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Option D</label>
-                        <input type="text" id="edqOptionD" value="${data.optionD}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Correct Option</label>
-                        <select id="edqCorrect" required>
-                            <option value="A" ${data.correctOption === 'A' ? 'selected' : ''}>A</option>
-                            <option value="B" ${data.correctOption === 'B' ? 'selected' : ''}>B</option>
-                            <option value="C" ${data.correctOption === 'C' ? 'selected' : ''}>C</option>
-                            <option value="D" ${data.correctOption === 'D' ? 'selected' : ''}>D</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-primary">Update Daily Quiz</button>
-                    <button type="button" class="btn-secondary" onclick="loadAdminDailyQuiz()">Cancel</button>
-                </form>
-            </div>
-        `;
+        const form = createForm([
+            { id: 'edqQuestion', label: 'Question', value: data.question, required: true },
+            { id: 'edqOptionA', label: 'Option A', value: data.optionA, required: true },
+            { id: 'edqOptionB', label: 'Option B', value: data.optionB, required: true },
+            { id: 'edqOptionC', label: 'Option C', value: data.optionC, required: true },
+            { id: 'edqOptionD', label: 'Option D', value: data.optionD, required: true },
+            { 
+                id: 'edqCorrect', 
+                label: 'Correct Option', 
+                type: 'select',
+                value: data.correctOption,
+                options: [
+                    { value: 'A', text: 'A' },
+                    { value: 'B', text: 'B' },
+                    { value: 'C', text: 'C' },
+                    { value: 'D', text: 'D' }
+                ],
+                required: true 
+            }
+        ], null, 'loadAdminDailyQuiz');
         
         document.getElementById('dailyQuizList').innerHTML = form;
         
-        document.getElementById('editDailyQuizForm').addEventListener('submit', async (e) => {
+        document.querySelector('#dailyQuizList form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const quizData = {
@@ -263,7 +265,7 @@ window.deleteDailyQuiz = async function(id) {
     }
 };
 
-// Topics Admin
+// ===== TOPICS MANAGEMENT =====
 async function loadAdminTopics() {
     try {
         const response = await fetch(`${API_URL}/quiz/topics`, {
@@ -287,7 +289,6 @@ async function loadAdminTopics() {
                 </div>
             `).join('');
 
-            // Load questions for each topic
             topics.forEach(topic => loadTopicQuestionsAdmin(topic._id));
         } else {
             container.innerHTML = '<p class="empty-message">No topics available</p>';
@@ -492,11 +493,7 @@ window.deleteQuestion = async function(topicId, questionId) {
     }
 };
 
-// Continue with Papers, Channels, Apps, and Help admin functions...
-// (Implementation follows similar patterns)
-// Complete Admin Dashboard Implementation
-
-// Papers Admin
+// ===== PAPERS MANAGEMENT =====
 async function loadAdminPapers() {
     try {
         const response = await fetch(`${API_URL}/papers`, {
@@ -507,19 +504,14 @@ async function loadAdminPapers() {
         const container = document.getElementById('papersList');
         
         if (response.ok && papers.length > 0) {
-            container.innerHTML = papers.map(paper => `
-                <div class="admin-item">
-                    <div class="admin-item-content">
-                        <strong>${paper.topicName}</strong><br>
-                        ${paper.description}<br>
-                        <a href="${paper.pdfUrl}" target="_blank">PDF Link</a>
-                    </div>
-                    <div class="admin-item-actions">
-                        <button class="edit-btn" onclick="editPaper('${paper._id}')">Edit</button>
-                        <button class="delete-btn" onclick="deletePaper('${paper._id}')">Delete</button>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = papers.map(paper => renderAdminItem(
+                `<strong>${paper.topicName}</strong><br>
+                ${paper.description}<br>
+                <a href="${paper.pdfUrl}" target="_blank">PDF Link</a>`,
+                'editPaper',
+                'deletePaper',
+                paper._id
+            )).join('');
         } else {
             container.innerHTML = '<p class="empty-message">No papers available</p>';
         }
@@ -674,7 +666,7 @@ window.deletePaper = async function(id) {
     }
 };
 
-// Channels Admin
+// ===== CHANNELS MANAGEMENT =====
 async function loadAdminChannels() {
     try {
         const response = await fetch(`${API_URL}/channels`, {
@@ -685,19 +677,14 @@ async function loadAdminChannels() {
         const container = document.getElementById('channelsList');
         
         if (response.ok && channels.length > 0) {
-            container.innerHTML = channels.map(channel => `
-                <div class="admin-item">
-                    <div class="admin-item-content">
-                        <strong>${channel.name}</strong><br>
-                        ${channel.description}<br>
-                        <a href="${channel.url}" target="_blank">${channel.url}</a>
-                    </div>
-                    <div class="admin-item-actions">
-                        <button class="edit-btn" onclick="editChannel('${channel._id}')">Edit</button>
-                        <button class="delete-btn" onclick="deleteChannel('${channel._id}')">Delete</button>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = channels.map(channel => renderAdminItem(
+                `<strong>${channel.name}</strong><br>
+                ${channel.description}<br>
+                <a href="${channel.url}" target="_blank">${channel.url}</a>`,
+                'editChannel',
+                'deleteChannel',
+                channel._id
+            )).join('');
         } else {
             container.innerHTML = '<p class="empty-message">No channels available</p>';
         }
@@ -852,7 +839,7 @@ window.deleteChannel = async function(id) {
     }
 };
 
-// Apps Admin
+// ===== APPS MANAGEMENT =====
 async function loadAdminApps() {
     try {
         const response = await fetch(`${API_URL}/apps`, {
@@ -863,19 +850,14 @@ async function loadAdminApps() {
         const container = document.getElementById('appsList');
         
         if (response.ok && apps.length > 0) {
-            container.innerHTML = apps.map(app => `
-                <div class="admin-item">
-                    <div class="admin-item-content">
-                        <strong>${app.name}</strong><br>
-                        ${app.features}<br>
-                        <a href="${app.downloadUrl}" target="_blank">Download Link</a>
-                    </div>
-                    <div class="admin-item-actions">
-                        <button class="edit-btn" onclick="editApp('${app._id}')">Edit</button>
-                        <button class="delete-btn" onclick="deleteApp('${app._id}')">Delete</button>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = apps.map(app => renderAdminItem(
+                `<strong>${app.name}</strong><br>
+                ${app.features}<br>
+                <a href="${app.downloadUrl}" target="_blank">Download Link</a>`,
+                'editApp',
+                'deleteApp',
+                app._id
+            )).join('');
         } else {
             container.innerHTML = '<p class="empty-message">No apps available</p>';
         }
@@ -1030,7 +1012,7 @@ window.deleteApp = async function(id) {
     }
 };
 
-// Help Admin
+// ===== HELP MANAGEMENT =====
 async function loadAdminHelp() {
     try {
         const response = await fetch(`${API_URL}/help`, {
@@ -1041,18 +1023,13 @@ async function loadAdminHelp() {
         const container = document.getElementById('helpList');
         
         if (response.ok && help.pdfUrl) {
-            container.innerHTML = `
-                <div class="admin-item">
-                    <div class="admin-item-content">
-                        <strong>Help PDF</strong><br>
-                        <a href="${help.pdfUrl}" target="_blank">${help.pdfUrl}</a>
-                    </div>
-                    <div class="admin-item-actions">
-                        <button class="edit-btn" onclick="editHelp('${help._id}')">Edit</button>
-                        <button class="delete-btn" onclick="deleteHelp('${help._id}')">Delete</button>
-                    </div>
-                </div>
-            `;
+            container.innerHTML = renderAdminItem(
+                `<strong>Help PDF</strong><br>
+                <a href="${help.pdfUrl}" target="_blank">${help.pdfUrl}</a>`,
+                'editHelp',
+                'deleteHelp',
+                help._id
+            );
         } else {
             container.innerHTML = '<p class="empty-message">No help document set</p>';
         }
@@ -1181,4 +1158,4 @@ window.deleteHelp = async function(id) {
         console.error('Error deleting help:', error);
         showMessage('Error deleting help PDF', 'error');
     }
-};
+}

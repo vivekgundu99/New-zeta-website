@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://zeta-website.onrender.com';
 
 // Theme Management
 const themeToggle = document.getElementById('themeToggle');
