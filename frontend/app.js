@@ -351,12 +351,18 @@ async function answerQuestion(questionId, answer, type) {
 
         if (response.ok) {
             if (type === 'daily') {
-                loadDailyQuiz();
-            } else {
-                const topicBtn = event.target.closest('.questions-container').querySelector('h4');
-                if (topicBtn) {
-                    const topicId = new URLSearchParams(window.location.search).get('topicId');
-                    location.reload();
+                await loadDailyQuiz();
+            } else if (type === 'competitive') {
+                // Re-render the questions for the current topic
+                const topicNameElem = document.querySelector('#questionsContainer h4');
+                const topicName = topicNameElem ? topicNameElem.textContent : '';
+                const topicId = document.querySelector('.back-to-topics')?.dataset.topicId;
+
+                if (topicId && topicName) {
+                    await loadTopicQuestions(topicId, topicName);
+                } else {
+                    // fallback: just reload topics list
+                    backToTopics();
                 }
             }
         }
@@ -366,6 +372,7 @@ async function answerQuestion(questionId, answer, type) {
 }
 
 window.answerQuestion = answerQuestion;
+
 
 // Get User Answer
 async function getUserAnswer(type, questionId) {
