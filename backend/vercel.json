@@ -8,19 +8,103 @@
   ],
   "routes": [
     {
-      "src": "/api/auth/(.*)",
+      "src": "/api/auth/signup",
       "dest": "/api/auth.js"
     },
     {
-      "src": "/api/admin/(.*)",
+      "src": "/api/auth/login",
+      "dest": "/api/auth.js"
+    },
+    {
+      "src": "/api/auth/security-question",
+      "dest": "/api/auth.js"
+    },
+    {
+      "src": "/api/auth/reset-password",
+      "dest": "/api/auth.js"
+    },
+    {
+      "src": "/api/auth/update-password",
+      "dest": "/api/auth.js"
+    },
+    {
+      "src": "/api/auth/delete-account",
+      "dest": "/api/auth.js"
+    },
+    {
+      "src": "/api/admin/quiz/daily",
       "dest": "/api/admin.js"
     },
     {
-      "src": "/api/quiz/(.*)",
+      "src": "/api/admin/quiz/daily/(.*)",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/quiz/topic",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/quiz/topic/(.*)",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/papers",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/papers/(.*)",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/channels",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/channels/(.*)",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/apps",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/apps/(.*)",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/help",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/admin/help/(.*)",
+      "dest": "/api/admin.js"
+    },
+    {
+      "src": "/api/quiz/daily",
       "dest": "/api/quiz.js"
     },
     {
-      "src": "/api/papers(.*)",
+      "src": "/api/quiz/topics",
+      "dest": "/api/quiz.js"
+    },
+    {
+      "src": "/api/quiz/topic/(.*)",
+      "dest": "/api/quiz.js"
+    },
+    {
+      "src": "/api/quiz/answer",
+      "dest": "/api/quiz.js"
+    },
+    {
+      "src": "/api/quiz/user-answer",
+      "dest": "/api/quiz.js"
+    },
+    {
+      "src": "/api/papers",
+      "dest": "/api/papers.js"
+    },
+    {
+      "src": "/api/papers/search",
       "dest": "/api/papers.js"
     },
     {

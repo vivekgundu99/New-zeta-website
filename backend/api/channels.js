@@ -28,8 +28,6 @@ module.exports = async (req, res) => {
 
         if (req.method === 'GET') {
             const channels = await Channel.find().sort({ createdAt: -1 });
-            
-            // Return channels with URLs exactly as stored - NO MODIFICATION
             return res.json(channels);
         }
 

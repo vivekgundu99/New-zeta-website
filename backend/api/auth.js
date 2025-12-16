@@ -4,6 +4,22 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const connectDB = require('../lib/db');
 
+// Helper to parse JSON body
+async function parseBody(req) {
+    return new Promise((resolve, reject) => {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', () => {
+            try {
+                resolve(body ? JSON.parse(body) : {});
+            } catch (e) {
+                reject(e);
+            }
+        });
+        req.on('error', reject);
+    });
+}
+
 module.exports = async (req, res) => {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -18,13 +34,14 @@ module.exports = async (req, res) => {
 
     await connectDB();
 
-    const { pathname } = new URL(req.url, `http://${req.headers.host}`);
-    const path = pathname.replace('/api/auth', '');
-
     try {
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const path = url.pathname;
+
         // Signup
-        if (path === '/signup' && req.method === 'POST') {
-            const { fullname, email, password, securityQuestion, securityAnswer } = req.body;
+        if (path === '/api/auth/signup' && req.method === 'POST') {
+            const body = await parseBody(req);
+            const { fullname, email, password, securityQuestion, securityAnswer } = body;
 
             const existingUser = await User.findOne({ email });
             if (existingUser) {
@@ -44,8 +61,9 @@ module.exports = async (req, res) => {
         }
 
         // Login
-        if (path === '/login' && req.method === 'POST') {
-            const { email, password } = req.body;
+        if (path === '/api/auth/login' && req.method === 'POST') {
+            const body = await parseBody(req);
+            const { email, password } = body;
 
             const user = await User.findOne({ email });
             if (!user) {
@@ -74,8 +92,8 @@ module.exports = async (req, res) => {
         }
 
         // Get security question
-        if (path === '/security-question' && req.method === 'GET') {
-            const email = new URL(req.url, `http://${req.headers.host}`).searchParams.get('email');
+        if (path === '/api/auth/security-question' && req.method === 'GET') {
+            const email = url.searchParams.get('email');
             
             const user = await User.findOne({ email });
             if (!user) {
@@ -86,8 +104,9 @@ module.exports = async (req, res) => {
         }
 
         // Reset password
-        if (path === '/reset-password' && req.method === 'POST') {
-            const { email, securityQuestion, securityAnswer, newPassword } = req.body;
+        if (path === '/api/auth/reset-password' && req.method === 'POST') {
+            const body = await parseBody(req);
+            const { email, securityQuestion, securityAnswer, newPassword } = body;
 
             const user = await User.findOne({ email, securityQuestion });
             if (!user) {
@@ -106,7 +125,7 @@ module.exports = async (req, res) => {
         }
 
         // Update password (authenticated)
-        if (path === '/update-password' && req.method === 'POST') {
+        if (path === '/api/auth/update-password' && req.method === 'POST') {
             const token = req.headers.authorization?.replace('Bearer ', '');
             if (!token) {
                 return res.status(401).json({ message: 'No authentication token' });
@@ -115,7 +134,8 @@ module.exports = async (req, res) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const user = await User.findById(decoded.userId);
 
-            const { currentPassword, newPassword } = req.body;
+            const body = await parseBody(req);
+            const { currentPassword, newPassword } = body;
 
             const isPasswordValid = await user.comparePassword(currentPassword);
             if (!isPasswordValid) {
@@ -129,7 +149,7 @@ module.exports = async (req, res) => {
         }
 
         // Delete account (authenticated)
-        if (path === '/delete-account' && req.method === 'DELETE') {
+        if (path === '/api/auth/delete-account' && req.method === 'DELETE') {
             const token = req.headers.authorization?.replace('Bearer ', '');
             if (!token) {
                 return res.status(401).json({ message: 'No authentication token' });

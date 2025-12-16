@@ -28,8 +28,6 @@ module.exports = async (req, res) => {
 
         if (req.method === 'GET') {
             const apps = await App.find().sort({ createdAt: -1 });
-            
-            // Return apps with URLs exactly as stored - NO MODIFICATION
             return res.json(apps);
         }
 

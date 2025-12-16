@@ -26,17 +26,17 @@ module.exports = async (req, res) => {
 
         jwt.verify(token, process.env.JWT_SECRET);
 
-        const { pathname } = new URL(req.url, `http://${req.headers.host}`);
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const path = url.pathname;
 
         // Get all papers
-        if (pathname === '/api/papers' && req.method === 'GET') {
+        if (path === '/api/papers' && req.method === 'GET') {
             const papers = await Paper.find().sort({ createdAt: -1 });
             return res.json(papers);
         }
 
         // Search papers
-        if (pathname === '/api/papers/search' && req.method === 'GET') {
-            const url = new URL(req.url, `http://${req.headers.host}`);
+        if (path === '/api/papers/search' && req.method === 'GET') {
             const q = url.searchParams.get('q');
             
             const papers = await Paper.find({

@@ -4,6 +4,22 @@ const User = require('../models/user');
 const connectDB = require('../lib/db');
 const jwt = require('jsonwebtoken');
 
+// Helper to parse JSON body
+async function parseBody(req) {
+    return new Promise((resolve, reject) => {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', () => {
+            try {
+                resolve(body ? JSON.parse(body) : {});
+            } catch (e) {
+                reject(e);
+            }
+        });
+        req.on('error', reject);
+    });
+}
+
 module.exports = async (req, res) => {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -28,23 +44,23 @@ module.exports = async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
 
-        const { pathname } = new URL(req.url, `http://${req.headers.host}`);
-        const path = pathname.replace('/api/quiz', '');
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const path = url.pathname;
 
         // Get daily quiz
-        if (path === '/daily' && req.method === 'GET') {
+        if (path === '/api/quiz/daily' && req.method === 'GET') {
             const dailyQuiz = await DailyQuiz.findOne().sort({ createdAt: -1 });
             return res.json(dailyQuiz);
         }
 
         // Get all topics
-        if (path === '/topics' && req.method === 'GET') {
+        if (path === '/api/quiz/topics' && req.method === 'GET') {
             const topics = await Topic.find().select('_id name');
             return res.json(topics);
         }
 
         // Get topic with questions
-        if (path.match(/^\/topic\/[a-f0-9]{24}$/) && req.method === 'GET') {
+        if (path.match(/^\/api\/quiz\/topic\/[a-f0-9]{24}$/) && req.method === 'GET') {
             const topicId = path.split('/').pop();
             const topic = await Topic.findById(topicId);
             if (!topic) {
@@ -54,8 +70,9 @@ module.exports = async (req, res) => {
         }
 
         // Submit quiz answer
-        if (path === '/answer' && req.method === 'POST') {
-            const { questionId, answer, type } = req.body;
+        if (path === '/api/quiz/answer' && req.method === 'POST') {
+            const body = await parseBody(req);
+            const { questionId, answer, type } = body;
 
             const user = await User.findById(userId);
 
@@ -81,8 +98,7 @@ module.exports = async (req, res) => {
         }
 
         // Get user answer for a question
-        if (path === '/user-answer' && req.method === 'GET') {
-            const url = new URL(req.url, `http://${req.headers.host}`);
+        if (path === '/api/quiz/user-answer' && req.method === 'GET') {
             const type = url.searchParams.get('type');
             const questionId = url.searchParams.get('questionId');
 

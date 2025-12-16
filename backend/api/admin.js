@@ -5,6 +5,22 @@ const User = require('../models/user');
 const connectDB = require('../lib/db');
 const jwt = require('jsonwebtoken');
 
+// Helper to parse JSON body
+async function parseBody(req) {
+    return new Promise((resolve, reject) => {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', () => {
+            try {
+                resolve(body ? JSON.parse(body) : {});
+            } catch (e) {
+                reject(e);
+            }
+        });
+        req.on('error', reject);
+    });
+}
+
 // Admin authentication middleware
 async function verifyAdmin(req) {
     const token = req.headers.authorization?.replace('Bearer ', '');
@@ -40,58 +56,66 @@ module.exports = async (req, res) => {
         // Verify admin
         await verifyAdmin(req);
 
-        const { pathname } = new URL(req.url, `http://${req.headers.host}`);
-        const path = pathname.replace('/api/admin', '');
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const path = url.pathname;
 
         // Daily Quiz Management
-        if (path === '/quiz/daily' && req.method === 'POST') {
+        if (path === '/api/admin/quiz/daily' && req.method === 'POST') {
+            const body = await parseBody(req);
             await DailyQuiz.deleteMany({});
-            const dailyQuiz = new DailyQuiz(req.body);
+            const dailyQuiz = new DailyQuiz(body);
             await dailyQuiz.save();
             return res.status(201).json(dailyQuiz);
         }
 
-        if (path.match(/^\/quiz\/daily\/[a-f0-9]{24}$/) && req.method === 'PUT') {
+        if (path.match(/^\/api\/admin\/quiz\/daily\/[a-f0-9]{24}$/) && req.method === 'PUT') {
             const id = path.split('/').pop();
-            const dailyQuiz = await DailyQuiz.findByIdAndUpdate(id, req.body, { new: true });
+            const body = await parseBody(req);
+            const dailyQuiz = await DailyQuiz.findByIdAndUpdate(id, body, { new: true });
             return res.json(dailyQuiz);
         }
 
-        if (path.match(/^\/quiz\/daily\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
+        if (path.match(/^\/api\/admin\/quiz\/daily\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
             const id = path.split('/').pop();
             await DailyQuiz.findByIdAndDelete(id);
             return res.json({ message: 'Daily quiz deleted' });
         }
 
         // Topics Management
-        if (path === '/quiz/topic' && req.method === 'POST') {
-            const topic = new Topic(req.body);
+        if (path === '/api/admin/quiz/topic' && req.method === 'POST') {
+            const body = await parseBody(req);
+            const topic = new Topic(body);
             await topic.save();
             return res.status(201).json(topic);
         }
 
-        if (path.match(/^\/quiz\/topic\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
+        if (path.match(/^\/api\/admin\/quiz\/topic\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
             const id = path.split('/').pop();
             await Topic.findByIdAndDelete(id);
             return res.json({ message: 'Topic deleted' });
         }
 
         // Questions Management
-        if (path.match(/^\/quiz\/topic\/[a-f0-9]{24}\/question$/) && req.method === 'POST') {
-            const topicId = path.split('/')[3];
+        if (path.match(/^\/api\/admin\/quiz\/topic\/[a-f0-9]{24}\/question$/) && req.method === 'POST') {
+            const pathParts = path.split('/');
+            const topicId = pathParts[pathParts.indexOf('topic') + 1];
+            const body = await parseBody(req);
+            
             const topic = await Topic.findById(topicId);
             if (!topic) {
                 return res.status(404).json({ message: 'Topic not found' });
             }
-            topic.questions.push(req.body);
+            topic.questions.push(body);
             await topic.save();
             return res.status(201).json(topic);
         }
 
-        if (path.match(/^\/quiz\/topic\/[a-f0-9]{24}\/question\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
+        if (path.match(/^\/api\/admin\/quiz\/topic\/[a-f0-9]{24}\/question\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
             const parts = path.split('/');
-            const topicId = parts[3];
-            const questionId = parts[5];
+            const topicIndex = parts.indexOf('topic');
+            const topicId = parts[topicIndex + 1];
+            const questionId = parts[parts.length - 1];
+            
             const topic = await Topic.findById(topicId);
             if (!topic) {
                 return res.status(404).json({ message: 'Topic not found' });
@@ -102,109 +126,109 @@ module.exports = async (req, res) => {
         }
 
         // Papers Management
-        if (path === '/papers' && req.method === 'POST') {
-            const paper = new Paper(req.body);
+        if (path === '/api/admin/papers' && req.method === 'POST') {
+            const body = await parseBody(req);
+            const paper = new Paper(body);
             await paper.save();
             return res.status(201).json(paper);
         }
 
-        if (path.match(/^\/papers\/[a-f0-9]{24}$/) && req.method === 'PUT') {
+        if (path.match(/^\/api\/admin\/papers\/[a-f0-9]{24}$/) && req.method === 'PUT') {
             const id = path.split('/').pop();
-            const paper = await Paper.findByIdAndUpdate(id, req.body, { new: true });
+            const body = await parseBody(req);
+            const paper = await Paper.findByIdAndUpdate(id, body, { new: true });
             return res.json(paper);
         }
 
-        if (path.match(/^\/papers\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
+        if (path.match(/^\/api\/admin\/papers\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
             const id = path.split('/').pop();
             await Paper.findByIdAndDelete(id);
             return res.json({ message: 'Paper deleted' });
         }
 
-        // Channels Management - CRITICAL: Store URLs exactly as received
-        if (path === '/channels' && req.method === 'POST') {
-            // DO NOT modify photoUrl - store exactly as received
+        // Channels Management
+        if (path === '/api/admin/channels' && req.method === 'POST') {
+            const body = await parseBody(req);
             const channelData = {
-                name: req.body.name,
-                description: req.body.description,
-                url: req.body.url,
-                photoUrl: req.body.photoUrl || '' // Store empty string if not provided
+                name: body.name,
+                description: body.description,
+                url: body.url,
+                photoUrl: body.photoUrl || ''
             };
             const channel = new Channel(channelData);
             await channel.save();
-            console.log('Saved channel with photoUrl:', channel.photoUrl); // Debug log
             return res.status(201).json(channel);
         }
 
-        if (path.match(/^\/channels\/[a-f0-9]{24}$/) && req.method === 'PUT') {
+        if (path.match(/^\/api\/admin\/channels\/[a-f0-9]{24}$/) && req.method === 'PUT') {
             const id = path.split('/').pop();
-            // DO NOT modify photoUrl - store exactly as received
+            const body = await parseBody(req);
             const updateData = {
-                name: req.body.name,
-                description: req.body.description,
-                url: req.body.url,
-                photoUrl: req.body.photoUrl || ''
+                name: body.name,
+                description: body.description,
+                url: body.url,
+                photoUrl: body.photoUrl || ''
             };
             const channel = await Channel.findByIdAndUpdate(id, updateData, { new: true });
-            console.log('Updated channel with photoUrl:', channel.photoUrl); // Debug log
             return res.json(channel);
         }
 
-        if (path.match(/^\/channels\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
+        if (path.match(/^\/api\/admin\/channels\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
             const id = path.split('/').pop();
             await Channel.findByIdAndDelete(id);
             return res.json({ message: 'Channel deleted' });
         }
 
-        // Apps Management - CRITICAL: Store URLs exactly as received
-        if (path === '/apps' && req.method === 'POST') {
-            // DO NOT modify photoUrl - store exactly as received
+        // Apps Management
+        if (path === '/api/admin/apps' && req.method === 'POST') {
+            const body = await parseBody(req);
             const appData = {
-                name: req.body.name,
-                features: req.body.features,
-                downloadUrl: req.body.downloadUrl,
-                photoUrl: req.body.photoUrl || '' // Store empty string if not provided
+                name: body.name,
+                features: body.features,
+                downloadUrl: body.downloadUrl,
+                photoUrl: body.photoUrl || ''
             };
             const app = new App(appData);
             await app.save();
-            console.log('Saved app with photoUrl:', app.photoUrl); // Debug log
             return res.status(201).json(app);
         }
 
-        if (path.match(/^\/apps\/[a-f0-9]{24}$/) && req.method === 'PUT') {
+        if (path.match(/^\/api\/admin\/apps\/[a-f0-9]{24}$/) && req.method === 'PUT') {
             const id = path.split('/').pop();
-            // DO NOT modify photoUrl - store exactly as received
+            const body = await parseBody(req);
             const updateData = {
-                name: req.body.name,
-                features: req.body.features,
-                downloadUrl: req.body.downloadUrl,
-                photoUrl: req.body.photoUrl || ''
+                name: body.name,
+                features: body.features,
+                downloadUrl: body.downloadUrl,
+                photoUrl: body.photoUrl || ''
             };
             const app = await App.findByIdAndUpdate(id, updateData, { new: true });
-            console.log('Updated app with photoUrl:', app.photoUrl); // Debug log
             return res.json(app);
         }
 
-        if (path.match(/^\/apps\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
+        if (path.match(/^\/api\/admin\/apps\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
             const id = path.split('/').pop();
             await App.findByIdAndDelete(id);
             return res.json({ message: 'App deleted' });
         }
 
         // Help Management
-        if (path === '/help' && req.method === 'POST') {
+        if (path === '/api/admin/help' && req.method === 'POST') {
+            const body = await parseBody(req);
             await Help.deleteMany({});
-            const help = new Help(req.body);
+            const help = new Help(body);
             await help.save();
             return res.status(201).json(help);
         }
 
-        if (path.match(/^\/help\/[a-f0-9]{24}$/) && req.method === 'PUT') {
+        if (path.match(/^\/api\/admin\/help\/[a-f0-9]{24}$/) && req.method === 'PUT') {
             const id = path.split('/').pop();
-            const help = await Help.findByIdAndUpdate(id, req.body, { new: true });
+            const body = await parseBody(req);
+            const help = await Help.findByIdAndUpdate(id, body, { new: true });
             return res.json(help);
         }
 
-        if (path.match(/^\/help\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
+        if (path.match(/^\/api\/admin\/help\/[a-f0-9]{24}$/) && req.method === 'DELETE') {
             const id = path.split('/').pop();
             await Help.findByIdAndDelete(id);
             return res.json({ message: 'Help deleted' });

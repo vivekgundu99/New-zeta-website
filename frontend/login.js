@@ -1,5 +1,5 @@
 // Enhanced Login.js - Professional Authentication
-const API_URL = 'https://zeta-website.onrender.com/api';
+const API_URL = 'https://zeta-backend1.vercel.app/api';
 
 // Constants
 const MIN_PASSWORD_LENGTH = 6;
