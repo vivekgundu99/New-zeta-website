@@ -967,22 +967,36 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    min-height: 400px;
 }
 
-/* Card Images */
+/* Card Image at Top */
 .card-image {
     width: 100%;
-    height: 220px;
+    height: 200px;
     object-fit: cover;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    transition: transform var(--transition-base);
+    flex-shrink: 0;
+    display: block;
     background: var(--bg-secondary);
+}
+
+.channel-card .card-image,
+.app-card .card-image {
+    border-radius: 0;
 }
 
 .paper-card:hover .card-image,
 .channel-card:hover .card-image,
 .app-card:hover .card-image {
     transform: scale(1.05);
+}
+
+/* Card Content Area */
+.card-content {
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 /* Card Content Wrapper */
@@ -1054,15 +1068,8 @@ body {
     font-weight: 700;
     color: var(--primary-600);
     margin-bottom: var(--space-3);
-    margin-top: var(--space-4);
+    margin-top: 0;
     line-height: var(--leading-tight);
-}
-
-/* When image exists, adjust top margin */
-.card-image + .paper-title,
-.card-image + .channel-name,
-.card-image + .app-name {
-    margin-top: var(--space-6);
 }
 
 .paper-description,
@@ -1090,6 +1097,7 @@ body {
     background: var(--primary-50);
     border-radius: var(--radius-md);
     margin-top: auto;
+    align-self: flex-start;
 }
 .dark-theme .paper-link-indicator,
 .dark-theme .channel-link,

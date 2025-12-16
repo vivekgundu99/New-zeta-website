@@ -80,7 +80,95 @@ function createForm(fields, submitCallback, cancelCallback) {
     
     return html;
 }
+// ===== BULK QUIZ IMPORT =====
+function showBulkDailyQuizForm() {
+    const form = `
+        <div class="admin-item" style="background: var(--primary-50); border: 2px dashed var(--primary-300);">
+            <form id="bulkDailyQuizForm" style="width: 100%;">
+                <h4 style="color: var(--primary-600); margin-bottom: 16px;">📝 Bulk Import Daily Quiz</h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 16px;">
+                    Format: Question,Option A,Option B,Option C,Option D,Correct Answer (A/B/C/D)<br>
+                    One question per line. Example:<br>
+                    <code style="background: var(--bg-primary); padding: 8px; display: block; margin-top: 8px; border-radius: 4px;">
+                    What is H2O?,Water,Oxygen,Hydrogen,Carbon,A<br>
+                    What is CO2?,Water,Carbon Dioxide,Oxygen,Nitrogen,B
+                    </code>
+                </p>
+                <div class="form-group">
+                    <label>Paste Questions (CSV Format)</label>
+                    <textarea id="bulkDailyQuizText" rows="10" style="width: 100%; padding: 12px; border: 2px solid var(--border-light); border-radius: 8px; font-family: monospace;" required placeholder="Question,Option A,Option B,Option C,Option D,Correct Answer"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Import Questions</button>
+                <button type="button" class="btn-secondary" onclick="loadAdminDailyQuiz()">Cancel</button>
+            </form>
+        </div>
+    `;
+    
+    document.getElementById('dailyQuizList').insertAdjacentHTML('afterbegin', form);
+    
+    document.getElementById('bulkDailyQuizForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const text = document.getElementById('bulkDailyQuizText').value.trim();
+        const lines = text.split('\n').filter(line => line.trim());
+        
+        if (lines.length === 0) {
+            showMessage('Please enter at least one question', 'error');
+            return;
+        }
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const line of lines) {
+            const parts = line.split(',').map(p => p.trim());
+            
+            if (parts.length !== 6) {
+                errorCount++;
+                continue;
+            }
+            
+            const [question, optionA, optionB, optionC, optionD, correctOption] = parts;
+            
+            if (!['A', 'B', 'C', 'D'].includes(correctOption.toUpperCase())) {
+                errorCount++;
+                continue;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/quiz/daily`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        question,
+                        optionA,
+                        optionB,
+                        optionC,
+                        optionD,
+                        correctOption: correctOption.toUpperCase()
+                    })
+                });
+                
+                if (response.ok) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            } catch (error) {
+                errorCount++;
+            }
+        }
+        
+        showMessage(`Imported ${successCount} questions. ${errorCount} failed.`, successCount > 0 ? 'success' : 'error');
+        loadAdminDailyQuiz();
+        loadDailyQuiz();
+    });
+}
 
+window.showBulkDailyQuizForm = showBulkDailyQuizForm;
 // ===== DAILY QUIZ MANAGEMENT =====
 async function loadAdminDailyQuiz() {
     try {
@@ -278,8 +366,9 @@ async function loadAdminTopics() {
                 <div class="topic-item">
                     <div class="topic-header">
                         <h4>${topic.name}</h4>
-                        <div class="admin-item-actions">
+                        <div class="admin-item-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <button class="btn-primary" onclick="showAddQuestionForm('${topic._id}')">Add Question</button>
+                            <button class="btn-secondary" onclick="showBulkQuestionForm('${topic._id}')" style="background: var(--success-500); color: white; border: none;">📥 Bulk Import</button>
                             <button class="delete-btn" onclick="deleteTopic('${topic._id}')">Delete Topic</button>
                         </div>
                     </div>
@@ -372,6 +461,92 @@ function showAddTopicForm() {
     });
 }
 
+// ===== BULK COMPETITIVE QUIZ IMPORT =====
+window.showBulkQuestionForm = function(topicId) {
+    const form = `
+        <div class="question-item" style="background: var(--success-50); border: 2px dashed var(--success-300);">
+            <form id="bulkQuestionForm-${topicId}">
+                <h4 style="color: var(--success-600); margin-bottom: 16px;">📥 Bulk Import Questions</h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 16px;">
+                    Format: Question,Option A,Option B,Option C,Option D,Correct Answer (A/B/C/D)<br>
+                    One question per line. Example:<br>
+                    <code style="background: var(--bg-primary); padding: 8px; display: block; margin-top: 8px; border-radius: 4px;">
+                    What is photosynthesis?,Process of making food,Respiration,Digestion,Circulation,A<br>
+                    What is mitosis?,Cell division,Cell death,Cell growth,Cell mutation,A
+                    </code>
+                </p>
+                <div class="form-group">
+                    <label>Paste Questions (CSV Format)</label>
+                    <textarea id="bulkQuestionText-${topicId}" rows="10" style="width: 100%; padding: 12px; border: 2px solid var(--border-light); border-radius: 8px; font-family: monospace;" required placeholder="Question,Option A,Option B,Option C,Option D,Correct Answer"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Import Questions</button>
+                <button type="button" class="btn-secondary" onclick="loadTopicQuestionsAdmin('${topicId}')">Cancel</button>
+            </form>
+        </div>
+    `;
+    
+    document.getElementById(`questions-${topicId}`).insertAdjacentHTML('afterbegin', form);
+    
+    document.getElementById(`bulkQuestionForm-${topicId}`).addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const text = document.getElementById(`bulkQuestionText-${topicId}`).value.trim();
+        const lines = text.split('\n').filter(line => line.trim());
+        
+        if (lines.length === 0) {
+            showMessage('Please enter at least one question', 'error');
+            return;
+        }
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const line of lines) {
+            const parts = line.split(',').map(p => p.trim());
+            
+            if (parts.length !== 6) {
+                errorCount++;
+                continue;
+            }
+            
+            const [question, optionA, optionB, optionC, optionD, correctOption] = parts;
+            
+            if (!['A', 'B', 'C', 'D'].includes(correctOption.toUpperCase())) {
+                errorCount++;
+                continue;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/quiz/topic/${topicId}/question`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        question,
+                        optionA,
+                        optionB,
+                        optionC,
+                        optionD,
+                        correctOption: correctOption.toUpperCase()
+                    })
+                });
+                
+                if (response.ok) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            } catch (error) {
+                errorCount++;
+            }
+        }
+        
+        showMessage(`Imported ${successCount} questions. ${errorCount} failed.`, successCount > 0 ? 'success' : 'error');
+        loadTopicQuestionsAdmin(topicId);
+    });
+};
 window.showAddQuestionForm = function(topicId) {
     const form = `
         <div class="question-item">
