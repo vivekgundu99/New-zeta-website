@@ -559,6 +559,7 @@ async function loadTopicQuestions(topicId, topicName) {
             html += `<h4 style="margin-bottom: 20px; color: var(--primary-600); font-size: 1.5rem;">${escapeHtml(topicName)}</h4>`;
             
             for (const question of data.questions) {
+                question.topicId = topicId; // Add topicId to each question
                 const userAnswer = await getUserAnswer('competitive', question._id);
                 html += renderQuizQuestion(question, userAnswer, 'competitive');
             }
@@ -636,7 +637,7 @@ function renderQuizQuestion(question, userAnswer, type) {
 
 
 // Enhanced Answer Question
-async function answerQuestion(questionId, answer, type) {
+async function answerQuestion(questionId, answer, type, topicId = null) {
     try {
         showMessage('Submitting answer...', 'info');
 
@@ -651,17 +652,23 @@ async function answerQuestion(questionId, answer, type) {
 
         if (response.ok) {
             if (type === 'daily') {
-                await loadDailyQuiz(); // reload daily quiz
-            } else {
-                // Reload only the specific question for competitive quiz
-                const questionDiv = document.getElementById(`question-${questionId}`);
-                if (questionDiv) {
-                    const questionDataResponse = await fetchWithTimeout(`${API_URL}/quiz/question/${questionId}`, {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    const questionData = await questionDataResponse.json();
-                    const userAnswer = await getUserAnswer('competitive', questionId);
-                    questionDiv.innerHTML = renderQuizQuestion(questionData, userAnswer, 'competitive');
+                await loadDailyQuiz();
+            } else if (topicId) {
+                // Reload only the updated question
+                const topicResponse = await fetchWithTimeout(`${API_URL}/quiz/topic/${topicId}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const topicData = await topicResponse.json();
+                if (!topicData.questions) return;
+
+                for (const q of topicData.questions) {
+                    if (q._id === questionId) {
+                        const questionDiv = document.getElementById(`question-${q._id}`);
+                        if (questionDiv) {
+                            const userAnswer = await getUserAnswer('competitive', q._id);
+                            questionDiv.innerHTML = renderQuizQuestion(q, userAnswer, 'competitive');
+                        }
+                    }
                 }
             }
         } else {
@@ -671,25 +678,6 @@ async function answerQuestion(questionId, answer, type) {
     } catch (error) {
         console.error('Error submitting answer:', error);
         showMessage('Error submitting answer', 'error');
-    }
-}
-
-window.answerQuestion = answerQuestion;
-
-
-// Get User Answer
-async function getUserAnswer(type, questionId) {
-    try {
-        const response = await fetchWithTimeout(
-            `${API_URL}/quiz/user-answer?type=${type}&questionId=${questionId}`,
-            { headers: { 'Authorization': `Bearer ${authToken}` }}
-        );
-        
-        const data = await response.json();
-        return response.ok ? data.answer : null;
-    } catch (error) {
-        console.error('Error getting user answer:', error);
-        return null;
     }
 }
 
