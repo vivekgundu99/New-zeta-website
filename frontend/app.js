@@ -863,7 +863,7 @@ async function loadChannels() {
         if (response.ok && data.length > 0) {
             container.innerHTML = data.map(channel => `
                 <div class="channel-card">
-                    ${channel.photoUrl ? `<img src="${channel.photoUrl}" alt="${escapeHtml(channel.name)}" class="card-image">` : ''}
+                    ${channel.photoUrl ? `<img src="${channel.photoUrl}" alt="${escapeHtml(channel.name)}" class="card-image" onerror="this.style.display='none'">` : ''}
                     <h3 class="channel-name">📺 ${escapeHtml(channel.name)}</h3>
                     <p class="channel-description">${escapeHtml(channel.description)}</p>
                     <a href="${channel.url}" target="_blank" rel="noopener noreferrer" class="channel-link">
@@ -897,7 +897,7 @@ async function loadApps() {
         if (response.ok && data.length > 0) {
             container.innerHTML = data.map(app => `
                 <div class="app-card">
-                    ${app.photoUrl ? `<img src="${app.photoUrl}" alt="${escapeHtml(app.name)}" class="card-image">` : ''}
+                    ${app.photoUrl ? `<img src="${app.photoUrl}" alt="${escapeHtml(app.name)}" class="card-image" onerror="this.style.display='none'">` : ''}
                     <h3 class="app-name">📱 ${escapeHtml(app.name)}</h3>
                     <p class="app-features">${escapeHtml(app.features)}</p>
                     <a href="${app.downloadUrl}" target="_blank" rel="noopener noreferrer" class="app-link">
