@@ -1,16 +1,39 @@
-// routes/help.js
-const express = require('express');
-const router = express.Router();
+// backend/api/help.js
 const { Help } = require('../models/Content');
-const { auth } = require('../middleware/auth');
+const connectDB = require('../lib/db');
+const jwt = require('jsonwebtoken');
 
-router.get('/', auth, async (req, res) => {
-    try {
-        const help = await Help.findOne().sort({ updatedAt: -1 });
-        res.json(help || {});
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching help' });
+module.exports = async (req, res) => {
+    // Enable CORS
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
     }
-});
 
-module.exports = router;
+    await connectDB();
+
+    try {
+        // Verify authentication
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        if (!token) {
+            return res.status(401).json({ message: 'No authentication token' });
+        }
+
+        jwt.verify(token, process.env.JWT_SECRET);
+
+        if (req.method === 'GET') {
+            const help = await Help.findOne().sort({ updatedAt: -1 });
+            return res.json(help || {});
+        }
+
+        res.status(405).json({ message: 'Method not allowed' });
+    } catch (error) {
+        console.error('Help API Error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
