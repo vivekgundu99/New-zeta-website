@@ -6,7 +6,7 @@ let debounceTimer = null;
 // Constants
 const DEBOUNCE_DELAY = 300;
 const MESSAGE_DURATION = 3000;
-const API_TIMEOUT = 20000;
+const API_TIMEOUT = 10000;
 
 // Initialize with error handling
 document.addEventListener('DOMContentLoaded', () => {
@@ -64,8 +64,7 @@ function loadTheme() {
 }
 
 function applyTheme(theme) {
-    document.body.classList.remove('light-theme', 'dark-theme');
-    document.body.classList.add(`${theme}-theme`);
+    document.body.className = `${theme}-theme`;
     updateThemeIcon(theme);
     localStorage.setItem('theme', theme);
 }
@@ -81,7 +80,7 @@ function updateThemeIcon(theme) {
 // Theme toggle with smooth transition
 const themeToggle = document.getElementById('themeToggle');
 if (themeToggle) {
-    themeToggle.addEventListener('click', (event) => {
+    themeToggle.addEventListener('click', () => {
         const currentTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         applyTheme(newTheme);
@@ -123,7 +122,7 @@ function showWelcomePopup() {
     const popup = document.getElementById('welcomePopup');
     if (popup) {
         popup.style.display = 'block';
-        popup.removeAttribute('inert');
+        popup.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
         
         // Focus trap
@@ -170,9 +169,8 @@ function setupEventListeners() {
             const popup = document.getElementById('welcomePopup');
             if (popup) {
                 popup.style.display = 'none';
+                popup.setAttribute('aria-hidden', 'true');
                 document.body.style.overflow = '';
-                document.body.removeAttribute('style');
-
             }
         });
     }
@@ -274,11 +272,6 @@ function setupKeyboardNavigation() {
         }
     });
 }
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && document.activeElement?.onclick) {
-        document.activeElement.click();
-    }
-});
 
 // Modal Management
 function openModal(modalId) {
@@ -496,7 +489,7 @@ async function loadDailyQuiz() {
         const data = await response.json();
 
         if (response.ok && data) {
-            const userAnswer = await getUserAnswerAndCorrect('daily', data._id);
+            const userAnswer = await getUserAnswer('daily', data._id);
             container.innerHTML = renderQuizQuestion(data, userAnswer, 'daily');
         } else {
             container.innerHTML = '<p class="empty-message">📝 No daily quiz available today</p>';
@@ -559,10 +552,10 @@ async function loadTopicQuestions(topicId, topicName) {
             html += `<h4 style="margin-bottom: 20px; color: var(--primary-600); font-size: 1.5rem;">${escapeHtml(topicName)}</h4>`;
             
             for (const question of data.questions) {
-                question.topicId = topicId;
-                const questionData = await getUserAnswerAndCorrect(question._id, 'competitive');
-                html += renderQuizQuestion(questionData, questionData.answer, 'competitive');
+                const userAnswer = await getUserAnswer('competitive', question._id);
+                html += renderQuizQuestion(question, userAnswer, 'competitive');
             }
+            
             container.innerHTML = html;
         } else {
             container.innerHTML = `
@@ -596,51 +589,49 @@ window.backToTopics = backToTopics;
 function renderQuizQuestion(question, userAnswer, type) {
     const answered = userAnswer !== null;
     const isCorrect = answered && userAnswer === question.correctOption;
-
-    let html = `<div class="quiz-question" id="question-${question._id}">`;
-    html += `<p class="question-text">${escapeHtml(question.question || '')}</p>`;
+    
+    let html = '<div class="quiz-question">';
+    html += `<p class="question-text">${escapeHtml(question.question)}</p>`;
     html += '<div class="options-container">';
-
-    ['optionA','optionB','optionC','optionD'].forEach((opt, index) => {
+    
+    ['optionA', 'optionB', 'optionC', 'optionD'].forEach((opt, index) => {
         const optionLetter = String.fromCharCode(65 + index);
         const isUserAnswer = answered && userAnswer === optionLetter;
         const isCorrectOption = question.correctOption === optionLetter;
-
+        
         let className = 'option-btn';
         if (answered) {
             if (isCorrectOption) className += ' correct';
             else if (isUserAnswer) className += ' wrong';
         }
-
+        
         html += `<button class="${className}" 
-                        onclick="answerQuestion('${question._id}', '${optionLetter}', '${type}', '${question.topicId || ''}')"
-                        ${answered ? 'disabled' : ''}
-                        aria-label="Option ${optionLetter}">
-                    ${optionLetter}. ${escapeHtml(question[opt] || '')}
-                </button>`;
+                         onclick="answerQuestion('${question._id}', '${optionLetter}', '${type}')"
+                         ${answered ? 'disabled' : ''}
+                         aria-label="Option ${optionLetter}">
+                    ${optionLetter}. ${escapeHtml(question[opt])}
+                 </button>`;
     });
-
+    
     html += '</div>';
-
+    
     if (answered) {
         const icon = isCorrect ? '✓' : '✗';
         const text = isCorrect ? 'Correct!' : 'Incorrect';
         html += `<div class="quiz-result ${isCorrect ? 'correct' : 'wrong'}" role="alert">
                     ${icon} ${text}
-                </div>`;
+                 </div>`;
     }
-
+    
     html += '</div>';
     return html;
 }
 
-
-
 // Enhanced Answer Question
-async function answerQuestion(questionId, answer, type, topicId) {
+async function answerQuestion(questionId, answer, type) {
     try {
         showMessage('Submitting answer...', 'info');
-
+        
         const response = await fetchWithTimeout(`${API_URL}/quiz/answer`, {
             method: 'POST',
             headers: {
@@ -650,52 +641,47 @@ async function answerQuestion(questionId, answer, type, topicId) {
             body: JSON.stringify({ questionId, answer, type })
         });
 
-        if (response.ok && topicId) {
-            const questionDiv = document.getElementById(`question-${questionId}`);
-            if (questionDiv) {
-                // Fetch updated question with correct answer
-                const questionData = await getUserAnswerAndCorrect(questionId, type);
-                questionDiv.innerHTML = renderQuizQuestion(questionData, questionData.answer, type);
+        if (response.ok) {
+            if (type === 'daily') {
+                await loadDailyQuiz();
+            } else {
+                // Reload current topic
+                const questionsContainer = document.getElementById('questionsContainer');
+                if (questionsContainer) {
+                    const topicHeader = questionsContainer.querySelector('h4');
+                    if (topicHeader) {
+                        // Get topic ID from URL or stored data
+                        location.reload(); // Simplified for now
+                    }
+                }
             }
-        } else if (!response.ok) {
+        } else {
             const data = await response.json();
             showMessage(data.message || 'Failed to submit answer', 'error');
         }
-    } catch (err) {
-        console.error('Error submitting answer:', err);
+    } catch (error) {
+        console.error('Error submitting answer:', error);
         showMessage('Error submitting answer', 'error');
     }
 }
-// Fetch the user's submitted answer for a given question
-// Fetch user's answer and full question data
-async function getUserAnswerAndCorrect(questionId, type) {
+
+window.answerQuestion = answerQuestion;
+
+// Get User Answer
+async function getUserAnswer(type, questionId) {
     try {
         const response = await fetchWithTimeout(
             `${API_URL}/quiz/user-answer?type=${type}&questionId=${questionId}`,
-            { headers: { 'Authorization': `Bearer ${authToken}` } }
+            { headers: { 'Authorization': `Bearer ${authToken}` }}
         );
+        
         const data = await response.json();
-
-        if (response.ok && data.question) {
-            return {
-                _id: data.question._id,
-                question: data.question.question,
-                optionA: data.question.optionA,
-                optionB: data.question.optionB,
-                optionC: data.question.optionC,
-                optionD: data.question.optionD,
-                correctOption: data.correctOption,
-                answer: data.answer
-            };
-        } else {
-            return { _id: questionId, answer: null, correctOption: null };
-        }
-    } catch (err) {
-        console.error('Error fetching user answer:', err);
-        return { _id: questionId, answer: null, correctOption: null };
+        return response.ok ? data.answer : null;
+    } catch (error) {
+        console.error('Error getting user answer:', error);
+        return null;
     }
 }
-
 
 // Enhanced Load Papers
 async function loadPapers() {
@@ -775,8 +761,7 @@ async function searchPapers(query) {
         
         const data = await response.json();
         
-        if (Array.isArray(data) && data.length > 0) {
-
+        if (data.length > 0) {
             displayAllPapers(data);
         } else {
             container.innerHTML = '<p class="empty-message">🔍 No papers found matching your search</p>';
@@ -870,25 +855,10 @@ function escapeHtml(text) {
 }
 
 // Admin Dashboard
-
 function openAdminDashboard() {
     openModal('adminModal');
-
     if (typeof loadAdminData === 'function') {
         loadAdminData();
     }
-
     if (typeof setupAdminListeners === 'function') {
-        setupAdminListeners();
-    }
-}
-async function fetchWithRetry(url, options = {}, retries = 2) {
-    try {
-        return await fetchWithRetry(url, options);
-    } catch (err) {
-        if (retries > 0) {
-            return fetchWithRetry(url, options, retries - 1);
-        }
-        throw err;
-    }
-}
+        setupAdminListeners
