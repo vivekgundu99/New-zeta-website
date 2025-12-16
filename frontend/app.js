@@ -6,7 +6,7 @@ let debounceTimer = null;
 // Constants
 const DEBOUNCE_DELAY = 300;
 const MESSAGE_DURATION = 3000;
-const API_TIMEOUT = 10000;
+const API_TIMEOUT = 20000;
 
 // Initialize with error handling
 document.addEventListener('DOMContentLoaded', () => {
@@ -123,7 +123,7 @@ function showWelcomePopup() {
     const popup = document.getElementById('welcomePopup');
     if (popup) {
         popup.style.display = 'block';
-        popup.setAttribute('aria-hidden', 'false');
+        popup.removeAttribute('inert');
         document.body.style.overflow = 'hidden';
         
         // Focus trap
@@ -170,7 +170,6 @@ function setupEventListeners() {
             const popup = document.getElementById('welcomePopup');
             if (popup) {
                 popup.style.display = 'none';
-                popup.setAttribute('aria-hidden', 'true');
                 document.body.style.overflow = '';
                 document.body.removeAttribute('style');
 
@@ -874,5 +873,15 @@ function openAdminDashboard() {
 
     if (typeof setupAdminListeners === 'function') {
         setupAdminListeners();
+    }
+}
+async function fetchWithRetry(url, options = {}, retries = 2) {
+    try {
+        return await fetchWithRetry(url, options);
+    } catch (err) {
+        if (retries > 0) {
+            return fetchWithRetry(url, options, retries - 1);
+        }
+        throw err;
     }
 }
