@@ -530,12 +530,20 @@ async function loadCompetitiveQuiz() {
     }
 }
 
+// Store current topic for reloading
+let currentTopicId = null;
+let currentTopicName = null;
+
 // Load Topic Questions
 async function loadTopicQuestions(topicId, topicName) {
     const container = document.getElementById('questionsContainer');
     const topicsContainer = document.getElementById('topicsContainer');
     
     if (!container || !topicsContainer) return;
+    
+    // Store current topic info for reloading after answer submission
+    currentTopicId = topicId;
+    currentTopicName = topicName;
     
     container.innerHTML = '<div class="skeleton" style="height: 300px; border-radius: 12px;"></div>';
     topicsContainer.style.display = 'none';
@@ -579,6 +587,10 @@ window.loadTopicQuestions = loadTopicQuestions;
 function backToTopics() {
     const topicsContainer = document.getElementById('topicsContainer');
     const questionsContainer = document.getElementById('questionsContainer');
+    
+    // Clear current topic info
+    currentTopicId = null;
+    currentTopicName = null;
     
     if (topicsContainer) topicsContainer.style.display = 'grid';
     if (questionsContainer) questionsContainer.style.display = 'none';
@@ -628,7 +640,7 @@ function renderQuizQuestion(question, userAnswer, type) {
     return html;
 }
 
-// Enhanced Answer Question
+// Enhanced Answer Question - No Page Refresh
 async function answerQuestion(questionId, answer, type) {
     try {
         showMessage('Submitting answer...', 'info');
@@ -643,11 +655,19 @@ async function answerQuestion(questionId, answer, type) {
         });
 
         if (response.ok) {
+            showMessage('Answer submitted successfully!', 'success');
+            
             if (type === 'daily') {
+                // Reload daily quiz
                 await loadDailyQuiz();
             } else {
-                // Reload current topic - need to extract topic info
-                location.reload();
+                // Reload competitive quiz topic without page refresh
+                if (currentTopicId && currentTopicName) {
+                    await loadTopicQuestions(currentTopicId, currentTopicName);
+                } else {
+                    // Fallback: reload competitive quiz section
+                    await loadCompetitiveQuiz();
+                }
             }
         } else {
             const data = await response.json();
