@@ -496,7 +496,7 @@ async function loadDailyQuiz() {
         const data = await response.json();
 
         if (response.ok && data) {
-            const userAnswer = await getUserAnswerAndCorrect('daily', data._id);
+            const userAnswer = await getUserAnswer('daily', data._id);
             container.innerHTML = renderQuizQuestion(data, userAnswer, 'daily');
         } else {
             container.innerHTML = '<p class="empty-message">📝 No daily quiz available today</p>';
@@ -560,7 +560,7 @@ async function loadTopicQuestions(topicId, topicName) {
             
             for (const question of data.questions) {
                 question.topicId = topicId; // Add topicId to each question
-                const userAnswer = await getUserAnswerAndCorrect('competitive', question._id);
+                const userAnswer = await getUserAnswer('competitive', question._id);
                 html += renderQuizQuestion(question, userAnswer, 'competitive');
             }
             
@@ -655,7 +655,7 @@ async function answerQuestion(questionId, answer, type, topicId) {
             // Only reload the updated question
             const questionDiv = document.getElementById(`question-${questionId}`);
             if (questionDiv) {
-                const data = await getUserAnswerAndCorrect(questionId);
+                const data = await getUserAnswer(questionId);
                 questionDiv.innerHTML = renderQuizQuestion({
                     _id: questionId,
                     correctOption: data.correctOption
@@ -672,7 +672,7 @@ async function answerQuestion(questionId, answer, type, topicId) {
 }
 
 // Fetch the user's submitted answer for a given question
-async function getUserAnswerAndCorrect(questionId) {
+async function getUserAnswer(questionId) {
     try {
         const response = await fetchWithTimeout(
             `${API_URL}/quiz/user-answer?type=competitive&questionId=${questionId}`,
