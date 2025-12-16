@@ -9,7 +9,7 @@
     "vercel-build": "echo 'Building for Vercel'"
   },
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "keywords": ["science", "education", "platform"],
   "author": "Zeta",

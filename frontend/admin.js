@@ -901,7 +901,7 @@ function showAddChannelForm() {
             name: document.getElementById('channelName').value,
             description: document.getElementById('channelDesc').value,
             url: document.getElementById('channelUrl').value,
-            photoUrl: document.getElementById('channelPhoto').value
+            photoUrl: document.getElementById('channelPhoto').value.trim() || ''
         };
 
         try {
