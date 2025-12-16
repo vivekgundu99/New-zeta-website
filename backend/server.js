@@ -12,12 +12,38 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => console.log('MongoDB Connected'))
-.catch(err => console.error('MongoDB Connection Error:', err));
+let isConnected = false;
+
+const connectDB = async () => {
+    if (isConnected) {
+        console.log('Using existing MongoDB connection');
+        return;
+    }
+
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+        });
+        isConnected = true;
+        console.log('MongoDB Connected');
+    } catch (err) {
+        console.error('MongoDB Connection Error:', err);
+        throw err;
+    }
+};
+
+// Connect to DB before handling requests
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        res.status(500).json({ message: 'Database connection failed' });
+    }
+});
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -37,14 +63,24 @@ app.use('/api/apps', appRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Health check endpoint
+app.get('/', (req, res) => {
+    res.json({ message: 'Zeta API is running on Vercel!' });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: 'Something went wrong!' });
 });
 
-const PORT = process.env.PORT || 5000;
+// For Vercel serverless
+module.exports = app;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
