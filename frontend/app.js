@@ -596,49 +596,50 @@ window.backToTopics = backToTopics;
 function renderQuizQuestion(question, userAnswer, type) {
     const answered = userAnswer !== null;
     const isCorrect = answered && userAnswer === question.correctOption;
-    
-    let html = '<div class="quiz-question">';
+
+    let html = `<div class="quiz-question" id="question-${question._id}">`; // Add unique ID
     html += `<p class="question-text">${escapeHtml(question.question)}</p>`;
     html += '<div class="options-container">';
-    
+
     ['optionA', 'optionB', 'optionC', 'optionD'].forEach((opt, index) => {
         const optionLetter = String.fromCharCode(65 + index);
         const isUserAnswer = answered && userAnswer === optionLetter;
         const isCorrectOption = question.correctOption === optionLetter;
-        
+
         let className = 'option-btn';
         if (answered) {
             if (isCorrectOption) className += ' correct';
             else if (isUserAnswer) className += ' wrong';
         }
-        
+
         html += `<button class="${className}" 
-                         onclick="answerQuestion('${question._id}', '${optionLetter}', '${type}')"
-                         ${answered ? 'disabled' : ''}
-                         aria-label="Option ${optionLetter}">
-                    ${optionLetter}. ${escapeHtml(question[opt])}
-                 </button>`;
+                    onclick="answerQuestion('${question._id}', '${optionLetter}', '${type}')"
+                    ${answered ? 'disabled' : ''}
+                    aria-label="Option ${optionLetter}">
+                ${optionLetter}. ${escapeHtml(question[opt])}
+            </button>`;
     });
-    
+
     html += '</div>';
-    
+
     if (answered) {
         const icon = isCorrect ? '✓' : '✗';
         const text = isCorrect ? 'Correct!' : 'Incorrect';
         html += `<div class="quiz-result ${isCorrect ? 'correct' : 'wrong'}" role="alert">
                     ${icon} ${text}
-                 </div>`;
+                </div>`;
     }
-    
+
     html += '</div>';
     return html;
 }
+
 
 // Enhanced Answer Question
 async function answerQuestion(questionId, answer, type) {
     try {
         showMessage('Submitting answer...', 'info');
-        
+
         const response = await fetchWithTimeout(`${API_URL}/quiz/answer`, {
             method: 'POST',
             headers: {
@@ -650,16 +651,17 @@ async function answerQuestion(questionId, answer, type) {
 
         if (response.ok) {
             if (type === 'daily') {
-                await loadDailyQuiz();
+                await loadDailyQuiz(); // reload daily quiz
             } else {
-                // Reload current topic
-                const questionsContainer = document.getElementById('questionsContainer');
-                if (questionsContainer) {
-                    const topicHeader = questionsContainer.querySelector('h4');
-                    if (topicHeader) {
-                        // Get topic ID from URL or stored data
-                        location.reload(); // Simplified for now
-                    }
+                // Reload only the specific question for competitive quiz
+                const questionDiv = document.getElementById(`question-${questionId}`);
+                if (questionDiv) {
+                    const questionDataResponse = await fetchWithTimeout(`${API_URL}/quiz/question/${questionId}`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    const questionData = await questionDataResponse.json();
+                    const userAnswer = await getUserAnswer('competitive', questionId);
+                    questionDiv.innerHTML = renderQuizQuestion(questionData, userAnswer, 'competitive');
                 }
             }
         } else {
@@ -673,6 +675,7 @@ async function answerQuestion(questionId, answer, type) {
 }
 
 window.answerQuestion = answerQuestion;
+
 
 // Get User Answer
 async function getUserAnswer(type, questionId) {
