@@ -365,18 +365,19 @@ async function loadAdminTopics() {
             container.innerHTML = topics.map(topic => `
                 <div class="topic-item">
                     <div class="topic-header">
-                        <h4>${topic.name}</h4>
+                        <h4 style="cursor: pointer;" onclick="toggleTopicQuestions('${topic._id}')">${topic.name} <span style="font-size: 0.875rem; color: var(--text-secondary);">(Click to expand)</span></h4>
                         <div class="admin-item-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <button class="btn-primary" onclick="showAddQuestionForm('${topic._id}')">Add Question</button>
                             <button class="btn-secondary" onclick="showBulkQuestionForm('${topic._id}')" style="background: var(--success-500); color: white; border: none;">📥 Bulk Import</button>
                             <button class="delete-btn" onclick="deleteTopic('${topic._id}')">Delete Topic</button>
                         </div>
                     </div>
-                    <div id="questions-${topic._id}"></div>
+                    <div id="questions-${topic._id}" style="display: none;"></div>
                 </div>
             `).join('');
 
-            topics.forEach(topic => loadTopicQuestionsAdmin(topic._id));
+            // Don't automatically load questions anymore
+            // topics.forEach(topic => loadTopicQuestionsAdmin(topic._id));
         } else {
             container.innerHTML = '<p class="empty-message">No topics available</p>';
         }
@@ -395,7 +396,8 @@ async function loadTopicQuestionsAdmin(topicId) {
         const container = document.getElementById(`questions-${topicId}`);
         
         if (response.ok && data.questions.length > 0) {
-            container.innerHTML = data.questions.map(q => `
+            let html = `<button class="back-to-topics" onclick="toggleTopicQuestions('${topicId}')" style="margin-bottom: 16px;">← Collapse Questions</button>`;
+            html += data.questions.map(q => `
                 <div class="question-item">
                     <strong>${q.question}</strong><br>
                     A: ${q.optionA} | B: ${q.optionB} | C: ${q.optionC} | D: ${q.optionD}<br>
@@ -406,8 +408,12 @@ async function loadTopicQuestionsAdmin(topicId) {
                     </div>
                 </div>
             `).join('');
+            container.innerHTML = html;
         } else {
-            container.innerHTML = '<p style="font-size: 14px; color: #6b7280; margin-top: 10px;">No questions yet</p>';
+            container.innerHTML = `
+                <button class="back-to-topics" onclick="toggleTopicQuestions('${topicId}')" style="margin-bottom: 16px;">← Collapse</button>
+                <p style="font-size: 14px; color: #6b7280; margin-top: 10px;">No questions yet</p>
+            `;
         }
     } catch (error) {
         console.error('Error loading topic questions:', error);
@@ -666,6 +672,25 @@ window.deleteQuestion = async function(topicId, questionId) {
     }
 };
 
+// Toggle topic questions visibility
+window.toggleTopicQuestions = async function(topicId) {
+    const questionsContainer = document.getElementById(`questions-${topicId}`);
+    
+    if (!questionsContainer) return;
+    
+    if (questionsContainer.style.display === 'none') {
+        // Show questions - load them if not already loaded
+        questionsContainer.style.display = 'block';
+        
+        // Check if questions are already loaded
+        if (questionsContainer.innerHTML.trim() === '') {
+            await loadTopicQuestionsAdmin(topicId);
+        }
+    } else {
+        // Hide questions
+        questionsContainer.style.display = 'none';
+    }
+};
 // ===== PAPERS MANAGEMENT =====
 async function loadAdminPapers() {
     try {
