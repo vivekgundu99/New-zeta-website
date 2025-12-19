@@ -2,15 +2,16 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const { authLimiter } = require('../middleware/security');
+const connectDB = require('../lib/db');
+const setCorsHeaders = require('../lib/cors'); // ADD THIS
 const { 
   signupSchema, 
   loginSchema, 
   updatePasswordSchema, 
   resetPasswordSchema 
 } = require('../validators/auth');
-const { authLimiter } = require('../middleware/security');
-const connectDB = require('../lib/db');
-const setCorsHeaders = require('../lib/cors'); // ADD THIS
+
 
 
 // Helper to parse JSON body
@@ -86,23 +87,24 @@ module.exports = async (req, res) => {
 
             const user = await User.findOne({ email }).select('+password +loginAttempts +lockUntil');
             
+            if (!user) {
+                return res.status(401).json({ message: 'Invalid email or password' });
+            }
+            
             // Check if account is locked
-            if (user && user.lockUntil && user.lockUntil > Date.now()) {
+            if (user.lockUntil && user.lockUntil > Date.now()) {
                 const lockMinutes = Math.ceil((user.lockUntil - Date.now()) / 60000);
                 return res.status(403).json({ 
                     message: `Account is locked. Try again in ${lockMinutes} minutes.` 
                 });
             }
-            if (!user) {
-                return res.status(401).json({ message: 'Invalid email or password' });
-            }
 
+            // IMPORTANT FIX: Use the instance method for password comparison
             const isPasswordValid = await user.comparePassword(password);
+            
             if (!isPasswordValid) {
                 // Increment login attempts
-                if (user) {
-                    await user.incrementLoginAttempts();
-                }
+                await user.incrementLoginAttempts();
                 return res.status(401).json({ message: 'Invalid email or password' });
             }
             

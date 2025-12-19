@@ -344,7 +344,6 @@ Create a `.env` file in the `backend` directory:
 
 ```env
 # MongoDB Configuration
-MONGODB_URI=example mongodb_uri
 w=majority
 
 # JWT Secret (generate a strong random string)
@@ -504,7 +503,6 @@ Access the application at `http://localhost:8000`
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `MONGODB_URI` | MongoDB connection string | `mongodb+srv://...` |
 | `JWT_SECRET` | Secret key for JWT tokens | `your-secret-key` |
 | `PORT` | Local server port | `5000` |
 | `NODE_ENV` | Environment mode | `production` |
