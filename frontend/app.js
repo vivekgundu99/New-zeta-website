@@ -490,6 +490,62 @@ async function loadDataWithProgress() {
     }
 }
 
+// Enhanced Load Papers
+async function loadPapers() {
+    const container = document.getElementById('recentPapers');
+    if (!container) return;
+    
+    container.innerHTML = '<div class="skeleton" style="height: 200px; border-radius: 12px;"></div>'.repeat(3);
+    
+    try {
+        const response = await fetchWithTimeout(`${API_URL}/papers`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        
+        const data = await response.json();
+
+        if (response.ok && data.length > 0) {
+            const recentPapers = data.slice(0, 3);
+            container.innerHTML = recentPapers.map(paper => `
+                <div class="paper-card" onclick="openPaper('${paper.pdfUrl}')" role="button" tabindex="0">
+                    <h3 class="paper-title">${escapeHtml(paper.topicName)}</h3>
+                    <p class="paper-description">${escapeHtml(paper.description)}</p>
+                    <span class="paper-link-indicator">📄 Open PDF →</span>
+                </div>
+            `).join('');
+            
+            if (data.length > 3) {
+                document.getElementById('showMorePapers').style.display = 'block';
+            }
+            
+            // Load all papers for modal
+            displayAllPapers(data);
+        } else {
+            container.innerHTML = '<p class="empty-message">📚 No research papers available yet</p>';
+        }
+    } catch (error) {
+        console.error('Error loading papers:', error);
+        container.innerHTML = '<p class="empty-message error">⚠️ Failed to load papers</p>';
+    }
+}
+
+// Get User Answer
+async function getUserAnswer(type, questionId) {
+    try {
+        const response = await fetchWithTimeout(
+            `${API_URL}/quiz/user-answer?type=${type}&questionId=${questionId}`,
+            { headers: { 'Authorization': `Bearer ${authToken}` } }
+        );
+        
+        if (response.ok) {
+            const data = await response.json();
+            return data.answer;
+        }
+        return null;
+    } catch (error) {
+        return null;
+    }
+}
 // Enhanced Fetch with Timeout
 async function fetchWithTimeout(url, options = {}, timeout = API_TIMEOUT) {
     const controller = new AbortController();
@@ -510,7 +566,6 @@ async function fetchWithTimeout(url, options = {}, timeout = API_TIMEOUT) {
         throw error;
     }
 }
-
 // Enhanced Load Daily Quiz with error handling
 async function loadDailyQuiz() {
     const container = document.getElementById('dailyQuizContainer');
@@ -829,8 +884,6 @@ function openPaper(url) {
 
 window.openPaper = openPaper;
 
-// Enhanced Load Channels
-// Enhanced Load Channels
 // Enhanced Load Channels
 async function loadChannels() {
     const container = document.getElementById('channelsContainer');

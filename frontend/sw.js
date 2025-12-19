@@ -44,27 +44,26 @@ self.addEventListener('activate', (event) => {
 });
 
 // Fetch event - serve from cache, fallback to network
+// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  // Skip API calls
-  if (event.request.url.includes('/api/')) {
+  // Skip chrome extensions and API calls
+  if (event.request.url.includes('chrome-extension://') || 
+      event.request.url.includes('/api/')) {
     return;
   }
 
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Cache hit - return response
         if (response) {
           return response;
         }
 
         return fetch(event.request).then((response) => {
-          // Check if valid response
           if (!response || response.status !== 200 || response.type !== 'basic') {
             return response;
           }
 
-          // Clone response
           const responseToCache = response.clone();
 
           caches.open(CACHE_NAME)
@@ -73,11 +72,13 @@ self.addEventListener('fetch', (event) => {
             });
 
           return response;
+        }).catch(() => {
+          // Return offline page or fallback
+          return new Response('Offline');
         });
       })
   );
 });
-
 // Background sync for quiz answers
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-quiz-answers') {
