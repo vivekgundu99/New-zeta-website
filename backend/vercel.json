@@ -122,6 +122,22 @@
     {
       "src": "/api/quiz/user-answers-bulk",
       "dest": "/api/quiz.js"
+    },
+    {
+      "src": "/api/analytics/user",
+      "dest": "/api/analytics.js"
+    },
+    {
+      "src": "/api/analytics/leaderboard",
+      "dest": "/api/analytics.js"
+    },
+    {
+      "src": "/api/analytics/leaderboard/topic/(.*)",
+      "dest": "/api/analytics.js"
+    },
+    {
+      "src": "/api/analytics/weekly-summary",
+      "dest": "/api/analytics.js"
     }
   ]
 }

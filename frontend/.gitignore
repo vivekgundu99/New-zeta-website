@@ -1,0 +1,173 @@
+# =======================
+# Dependencies
+# =======================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# =======================
+# Environment Variables
+# =======================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# =======================
+# Build Output
+# =======================
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+
+# =======================
+# Testing
+# =======================
+coverage/
+.nyc_output/
+*.test.js.snap
+
+# =======================
+# IDE / Editor
+# =======================
+# VSCode
+.vscode/
+.vscode-test/
+*.code-workspace
+
+# WebStorm / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# =======================
+# OS Files
+# =======================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# =======================
+# Logs
+# =======================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# =======================
+# Temporary Files
+# =======================
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.cache
+.temp/
+
+# =======================
+# Service Worker Cache
+# =======================
+workbox-*.js
+sw.js.map
+precache-manifest.*.js
+
+# =======================
+# Source Maps (Optional - Remove if you want to keep)
+# =======================
+*.map
+
+# =======================
+# Vercel
+# =======================
+.vercel
+.vercel.json
+
+# =======================
+# Firebase (if using)
+# =======================
+.firebase/
+.firebaserc
+firebase-debug.log
+firestore-debug.log
+
+# =======================
+# Optional: Compiled CSS (if using preprocessors)
+# =======================
+# *.css
+# !style.css
+
+# =======================
+# Optional: Minified files (if generating)
+# =======================
+# *.min.js
+# *.min.css
+
+# =======================
+# Security
+# =======================
+*.pem
+*.key
+*.cert
+secrets/
+credentials.json
+
+# =======================
+# Documentation (Optional)
+# =======================
+# docs/_build/
+# site/
+
+# =======================
+# Misc
+# =======================
+*.tgz
+*.zip
+*.tar.gz
+*.rar
+.sass-cache/
+connect.lock
+typings/
+.eslintcache
+.stylelintcache

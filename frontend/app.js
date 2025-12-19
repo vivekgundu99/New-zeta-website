@@ -665,6 +665,7 @@ window.backToTopics = backToTopics;
 function renderQuizQuestion(question, userAnswer, type, questionNumber = null) {
     const answered = userAnswer !== null;
     const isCorrect = answered && userAnswer === question.correctOption;
+    const startTime = Date.now(); // Add timer start
     
     let html = '<div class="quiz-question">';
     if (questionNumber) {
@@ -689,6 +690,7 @@ function renderQuizQuestion(question, userAnswer, type, questionNumber = null) {
                          data-question-id="${question._id}"
                          data-answer="${optionLetter}"
                          data-type="${type}"
+                         data-start-time="${startTime}"
                          ${answered ? 'disabled' : ''}
                          aria-label="Option ${optionLetter}">
                     ${optionLetter}. ${escapeHtml(question[opt])}
@@ -727,110 +729,47 @@ function setupQuizEventDelegation(container) {
             const questionId = button.getAttribute('data-question-id');
             const answer = button.getAttribute('data-answer');
             const type = button.getAttribute('data-type');
-            
+            const startTime = parseInt(button.getAttribute('data-start-time'));
+
             if (questionId && answer && type) {
-                await answerQuestion(questionId, answer, type);
+                await answerQuestion(questionId, answer, type, startTime);
             }
         }
     });
 }
 
 // Enhanced Answer Question - No Page Refresh
-async function answerQuestion(questionId, answer, type) {
+async function answerQuestion(questionId, answer, type, startTime) {
     try {
+        const timeTaken = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+        
         showMessage('Submitting answer...', 'info');
         
-        const response = await fetchWithTimeout(`${API_URL}/quiz/answer`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify({ questionId, answer, type })
+        const response = await api.post('/quiz/answer', {
+            questionId,
+            answer,
+            type,
+            timeTaken
         });
 
-        if (response.ok) {
+        if (response) {
             showMessage('Answer submitted successfully!', 'success');
             
             if (type === 'daily') {
-                // Reload daily quiz
                 await loadDailyQuiz();
             } else if (type === 'competitive') {
-                // Reload competitive quiz topic without page refresh
                 if (currentTopicId && currentTopicName) {
                     await loadTopicQuestions(currentTopicId, currentTopicName);
                 } else {
-                    // Fallback: reload competitive quiz section
                     await loadCompetitiveQuiz();
                 }
             }
-        } else {
-            const data = await response.json();
-            showMessage(data.message || 'Failed to submit answer', 'error');
         }
     } catch (error) {
         console.error('Error submitting answer:', error);
-        showMessage('Error submitting answer', 'error');
+        showMessage(error.message || 'Error submitting answer', 'error');
     }
 }
-
-window.answerQuestion = answerQuestion;
-
-// Get User Answer
-async function getUserAnswer(type, questionId) {
-    try {
-        const response = await fetchWithTimeout(
-            `${API_URL}/quiz/user-answer?type=${type}&questionId=${questionId}`,
-            { headers: { 'Authorization': `Bearer ${authToken}` }}
-        );
-        
-        const data = await response.json();
-        return response.ok ? data.answer : null;
-    } catch (error) {
-        console.error('Error getting user answer:', error);
-        return null;
-    }
-}
-
-// Enhanced Load Papers
-async function loadPapers() {
-    const recentContainer = document.getElementById('recentPapers');
-    if (!recentContainer) return;
-    
-    recentContainer.innerHTML = '<div class="skeleton" style="height: 200px; border-radius: 12px;"></div>'.repeat(3);
-    
-    try {
-        const response = await fetchWithTimeout(`${API_URL}/papers`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-        
-        const data = await response.json();
-
-        if (response.ok && data.length > 0) {
-            const recentPapers = data.slice(0, 3);
-            recentContainer.innerHTML = recentPapers.map(paper => `
-                <div class="paper-card" onclick="openPaper('${paper.pdfUrl}')" role="button" tabindex="0" aria-label="Open ${escapeHtml(paper.topicName)}">
-                    <h3 class="paper-title">${escapeHtml(paper.topicName)}</h3>
-                    <p class="paper-description">${escapeHtml(paper.description)}</p>
-                    <span class="paper-link-indicator">📄 Open PDF →</span>
-                </div>
-            `).join('');
-
-            const showMoreBtn = document.getElementById('showMorePapers');
-            if (showMoreBtn) {
-                showMoreBtn.style.display = data.length > 3 ? 'inline-block' : 'none';
-            }
-
-            displayAllPapers(data);
-        } else {
-            recentContainer.innerHTML = '<p class="empty-message">📚 No research papers available</p>';
-        }
-    } catch (error) {
-        console.error('Error loading papers:', error);
-        recentContainer.innerHTML = '<p class="empty-message error">⚠️ Failed to load papers</p>';
-    }
-}
-
 // Display All Papers
 function displayAllPapers(papers) {
     const container = document.getElementById('allPapersList');

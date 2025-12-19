@@ -1,0 +1,13 @@
+# Minimal .vercelignore
+node_modules
+.git
+.gitignore
+*.md
+.vscode
+.idea
+tests
+*.test.js
+coverage
+.env.local
+.DS_Store
+Thumbs.db

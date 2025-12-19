@@ -2,6 +2,13 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const { 
+  signupSchema, 
+  loginSchema, 
+  updatePasswordSchema, 
+  resetPasswordSchema 
+} = require('../validators/auth');
+const { authLimiter } = require('../middleware/security');
 const connectDB = require('../lib/db');
 const setCorsHeaders = require('../lib/cors'); // ADD THIS
 
@@ -35,7 +42,16 @@ module.exports = async (req, res) => {
         // Signup
         if (path === '/api/auth/signup' && req.method === 'POST') {
             const body = await parseBody(req);
-            const { fullname, email, password, securityQuestion, securityAnswer } = body;
+            
+            // Validate input
+            const { error, value } = signupSchema.validate(body);
+            if (error) {
+                return res.status(400).json({ 
+                    message: error.details[0].message 
+                });
+            }
+            
+            const { fullname, email, password, securityQuestion, securityAnswer } = value;
 
             const existingUser = await User.findOne({ email });
             if (existingUser) {
@@ -57,17 +73,47 @@ module.exports = async (req, res) => {
         // Login
         if (path === '/api/auth/login' && req.method === 'POST') {
             const body = await parseBody(req);
-            const { email, password } = body;
+            
+            // Validate input
+            const { error, value } = loginSchema.validate(body);
+            if (error) {
+                return res.status(400).json({ 
+                    message: error.details[0].message 
+                });
+            }
+            
+            const { email, password } = value;
 
-            const user = await User.findOne({ email });
+            const user = await User.findOne({ email }).select('+password +loginAttempts +lockUntil');
+            
+            // Check if account is locked
+            if (user && user.lockUntil && user.lockUntil > Date.now()) {
+                const lockMinutes = Math.ceil((user.lockUntil - Date.now()) / 60000);
+                return res.status(403).json({ 
+                    message: `Account is locked. Try again in ${lockMinutes} minutes.` 
+                });
+            }
             if (!user) {
                 return res.status(401).json({ message: 'Invalid email or password' });
             }
 
             const isPasswordValid = await user.comparePassword(password);
             if (!isPasswordValid) {
+                // Increment login attempts
+                if (user) {
+                    await user.incrementLoginAttempts();
+                }
                 return res.status(401).json({ message: 'Invalid email or password' });
             }
+            
+            // Reset login attempts on successful login
+            if (user.loginAttempts > 0 || user.lockUntil) {
+                await user.resetLoginAttempts();
+            }
+            
+            // Update last login
+            user.lastLogin = new Date();
+            await user.save();
 
             const token = jwt.sign(
                 { userId: user._id, email: user.email },

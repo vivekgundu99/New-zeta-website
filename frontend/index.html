@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zeta - Science Platform</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#9333ea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ZETA">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
 </head>
 <body class="light-theme">
     <!-- Header -->
@@ -18,6 +24,7 @@
                 <a href="#papers" class="nav-link">Research Papers</a>
                 <a href="#youtube" class="nav-link">YouTube Channels</a>
                 <a href="#apps" class="nav-link">Apps</a>
+                <a href="analytics.html" class="nav-link">Analytics</a>
             </nav>
             <div class="header-right">
                 <button id="adminBtn" class="header-btn admin-btn" style="display: none;">Admin</button>
@@ -264,9 +271,24 @@
     <div id="messagePopup" class="message-popup"></div>
 
     <script src="config.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/state-manager.js"></script>
+    <script src="js/api-client.js"></script>
     <script src="admin.js"></script>
     <script src="app.js"></script>
-
-
+    <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+            console.log('Service Worker registered:', registration);
+            })
+            .catch((error) => {
+            console.log('Service Worker registration failed:', error);
+            });
+        });
+    }
+    </script>
 </body>
 </html>

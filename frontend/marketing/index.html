@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZETA - Platform Features</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: #ffffff;
+        }
+        
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            page-break-after: always;
+            position: relative;
+        }
+        
+        /* Cover Page */
+        .cover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+        
+        .cover-logo {
+            font-size: 120px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+        
+        .cover-tagline {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+            z-index: 1;
+        }
+        
+        .cover-description {
+            font-size: 18px;
+            max-width: 600px;
+            line-height: 1.8;
+            opacity: 0.95;
+            margin-bottom: 60px;
+            z-index: 1;
+        }
+        
+        .cover-footer {
+            position: absolute;
+            bottom: 40px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Content Pages */
+        .content-page {
+            padding: 50px;
+        }
+        
+        .page-header {
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .page-subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            font-weight: 400;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-icon {
+            font-size: 28px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            padding: 24px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .feature-description {
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+        
+        .highlight-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 40px;
+            font-weight: 900;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .tech-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .screenshot-placeholder {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: 12px;
+            padding: 60px 30px;
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+        }
+        
+        .workflow-step {
+            display: flex;
+            align-items: start;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #1f2937;
+        }
+        
+        .step-content p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 30px;
+            left: 50px;
+            right: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #9ca3af;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .csv-example {
+            background: #1f2937;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+            
+            .feature-card:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- COVER PAGE -->
+    <div class="page cover">
+        <div class="cover-logo">ZETA</div>
+        <div class="cover-tagline">SCIENCE PLATFORM</div>
+        <div class="cover-description">
+            A comprehensive full-stack science education platform featuring advanced quiz systems, 
+            research paper management, multimedia content delivery, and powerful administrative controls. 
+            Built with modern serverless architecture for scalability and performance.
+        </div>
+        <div style="display: flex; gap: 20px; z-index: 1;">
+            <div style="background: rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 8px; backdrop-filter: blur(10px);">
+                <div style="font-size: 24px; font-weight: 700;">100%</div>
+                <div style="font-size: 12px; opacity: 0.9;">Cloud-Based</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 8px; backdrop-filter: blur(10px);">
+                <div style="font-size: 24px; font-weight: 700;">24/7</div>
+                <div style="font-size: 12px; opacity: 0.9;">Available</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 8px; backdrop-filter: blur(10px);">
+                <div style="font-size: 24px; font-weight: 700;">∞</div>
+                <div style="font-size: 12px; opacity: 0.9;">Scalable</div>
+            </div>
+        </div>
+        <div class="cover-footer">
+            Professional Features Documentation | Created by Vivek Gundu (Navodayan) | 2025
+        </div>
+    </div>
+
+    <!-- PAGE 1: OVERVIEW & ARCHITECTURE -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Content Library</div>
+            <div class="page-subtitle">Research papers, channels, and apps</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📚</span>
+                Research Papers Library
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">PDF Integration</div>
+                    <div class="feature-description">
+                        Direct Firebase PDF hosting with instant one-click access. Papers open 
+                        in new tab for convenient reading and reference.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Search Functionality</div>
+                    <div class="feature-description">
+                        Real-time search with 300ms debouncing. Find papers by topic name 
+                        instantly as you type.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Recent Papers Section</div>
+                    <div class="feature-description">
+                        Homepage displays 3 most recent papers for quick access. "Show More" 
+                        reveals complete library in modal.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Detailed Descriptions</div>
+                    <div class="feature-description">
+                        Each paper includes comprehensive description, topic categorization, 
+                        and publication date for easy selection.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🎥</span>
+                YouTube Channels Gallery
+            </div>
+            <ul class="feature-list">
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Visual Previews:</strong> Channel thumbnails hosted on ImgBB CDN for fast loading. 
+                        High-quality images give instant visual recognition of channels.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Google Drive Support:</strong> Automatic URL conversion from Google Drive share links 
+                        to direct image URLs for seamless image display.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Fallback Icons:</strong> If image fails to load, beautiful gradient background with 
+                        📺 icon appears automatically for consistent design.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Direct Channel Links:</strong> One-click access to YouTube channel pages. 
+                        Opens in new tab for uninterrupted platform experience.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Curated Content:</strong> Hand-picked educational science channels covering physics, 
+                        chemistry, biology, and interdisciplinary topics.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📱</span>
+                Educational Apps Marketplace
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">App Showcase</div>
+                    <div class="feature-description">
+                        Visual app gallery with screenshots and icons. ImgBB-hosted images 
+                        with Google Drive fallback support.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Feature Highlights</div>
+                    <div class="feature-description">
+                        Detailed feature descriptions for each app. Students know exactly 
+                        what functionality to expect before downloading.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Download Links</div>
+                    <div class="feature-description">
+                        Direct download URLs for instant access. Supports multiple platforms 
+                        and file hosting services.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Card-Based Layout</div>
+                    <div class="feature-description">
+                        Beautiful responsive cards with hover effects. Consistent design 
+                        language matching overall platform aesthetic.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 5</div>
+        </div>
+    </div>
+
+    <!-- PAGE 6: ADMIN DASHBOARD -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Admin Dashboard</div>
+            <div class="page-subtitle">Comprehensive content management system</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">👨‍💼</span>
+                Dashboard Overview
+            </div>
+            <p style="font-size: 15px; line-height: 1.8; color: #4b5563; margin-bottom: 20px;">
+                The admin dashboard is a powerful content management system accessible only to administrators 
+                (admin@zeta.com). It provides complete control over all platform content including quizzes, 
+                papers, channels, apps, and help documentation.
+            </p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">🎯 Multi-Tab Interface</div>
+                    <div class="feature-description">
+                        Organized tabs for Quiz Management, Research Papers, YouTube Channels, 
+                        Apps, and Help sections with smooth transitions.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">⚡ Real-Time Updates</div>
+                    <div class="feature-description">
+                        Changes reflect immediately for all users. Add, edit, or delete content 
+                        with instant synchronization across platform.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">🔒 Secure Access</div>
+                    <div class="feature-description">
+                        JWT-based authentication with admin email verification. Only authorized 
+                        administrators can access management features.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">📊 Visual Organization</div>
+                    <div class="feature-description">
+                        Expandable/collapsible sections, color-coded cards, and clear action 
+                        buttons for intuitive content management.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <div class="highlight-title">🚀 NEW: Bulk Import System</div>
+            <p style="margin-top: 10px; font-size: 15px; line-height: 1.7;">
+                Revolutionary CSV-based bulk import feature allows administrators to add multiple quiz questions 
+                simultaneously. Supports both Daily Quiz and Competitive Quiz topics with automatic validation, 
+                error handling, and success/failure reporting.
+            </p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📝</span>
+                Quiz Management Features
+            </div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Daily Quiz</th>
+                        <th>Competitive Quiz</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Add Single Question</strong></td>
+                        <td>✓ Form-based entry</td>
+                        <td>✓ Form-based per topic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bulk Import (CSV)</strong></td>
+                        <td>✓ Multiple questions at once</td>
+                        <td>✓ Per topic bulk import</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Edit Questions</strong></td>
+                        <td>✓ Update any field</td>
+                        <td>✓ Edit within topics</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Delete Questions</strong></td>
+                        <td>✓ With confirmation</td>
+                        <td>✓ Individual or topic-wide</td>
+                    </tr>
+                    <tr>
+                        <td><strong>View Questions</strong></td>
+                        <td>✓ Always visible</td>
+                        <td>✓ Expandable by topic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Question Counter</strong></td>
+                        <td>N/A (Single question)</td>
+                        <td>✓ Shows total per topic</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 6</div>
+        </div>
+    </div>
+
+    <!-- PAGE 7: BULK IMPORT SYSTEM -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Bulk Import System</div>
+            <div class="page-subtitle">Efficient CSV-based question management</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📥</span>
+                How Bulk Import Works
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Prepare CSV Data</h4>
+                    <p>Format questions in CSV: Question, Option A, Option B, Option C, Option D, Correct Answer (A/B/C/D)</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>Click Bulk Import Button</h4>
+                    <p>Green "📥 Bulk Import" button appears next to "Add Question" in both Daily and Competitive sections.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>Paste CSV Content</h4>
+                    <p>Large textarea accepts CSV data. Each line represents one question with comma-separated values.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>Automatic Processing</h4>
+                    <p>System validates format, checks for errors, imports valid questions, and reports success/failure counts.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📋</span>
+                CSV Format Example
+            </div>
+            <div class="csv-example">Question,Option A,Option B,Option C,Option D,Correct Answer
+What is H2O?,Water,Oxygen,Hydrogen,Carbon,A
+What is CO2?,Water,Carbon Dioxide,Oxygen,Nitrogen,B
+What is photosynthesis?,Process of making food,Respiration,Digestion,Circulation,A
+What is mitosis?,Cell division,Cell death,Cell growth,Cell mutation,A
+What is DNA?,Code of life,Protein,Vitamin,Mineral,A</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">✅</span>
+                Validation & Error Handling
+            </div>
+            <ul class="feature-list">
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Format Validation:</strong> Each line must have exactly 6 comma-separated values. 
+                        Lines with incorrect format are automatically skipped with error count.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Answer Validation:</strong> Correct answer must be A, B, C, or D (case-insensitive). 
+                        Invalid answers result in question being rejected.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Batch Processing:</strong> All valid questions are imported even if some fail. 
+                        System continues processing entire CSV despite individual errors.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Success Reporting:</strong> Clear feedback shows "Imported X questions. Y failed." 
+                        with color-coded success (green) or error (red) messages.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Empty Line Handling:</strong> Blank lines are automatically filtered out. 
+                        No errors thrown for whitespace-only lines.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="highlight-box">
+            <div class="highlight-title">⚡ Bulk Import Benefits</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <div>
+                    <h4 style="font-size: 16px; margin-bottom: 10px; font-weight: 600;">Time Efficiency</h4>
+                    <ul style="font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                        <li>Import 100+ questions in seconds</li>
+                        <li>No repetitive form filling</li>
+                        <li>Batch processing saves hours</li>
+                        <li>Copy-paste from spreadsheets</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="font-size: 16px; margin-bottom: 10px; font-weight: 600;">Quality Control</h4>
+                    <ul style="font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                        <li>Prepare questions in Excel/Sheets</li>
+                        <li>Review before importing</li>
+                        <li>Easy corrections in CSV format</li>
+                        <li>Consistent formatting</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 7</div>
+        </div>
+    </div>
+
+    <!-- PAGE 8: ADMIN CONTENT MANAGEMENT -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Content Management</div>
+            <div class="page-subtitle">Papers, channels, apps, and help administration</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📚</span>
+                Research Papers Management
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Add Papers</div>
+                    <div class="feature-description">
+                        Form with topic name, description, and Firebase PDF URL. Supports any 
+                        PDF hosting service with direct URLs.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Edit Papers</div>
+                    <div class="feature-description">
+                        Update any field including topic, description, or PDF link. Changes 
+                        reflect immediately across platform.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Delete Papers</div>
+                    <div class="feature-description">
+                        Remove papers with confirmation dialog. Permanent deletion from 
+                        database (PDF file remains in Firebase).
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">View All Papers</div>
+                    <div class="feature-description">
+                        Scrollable list showing all papers with edit/delete actions. 
+                        Organized by creation date (newest first).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🎥</span>
+                YouTube Channels Management
+            </div>
+            <ul class="feature-list">
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Add Channels:</strong> Form includes channel name, description, YouTube URL, 
+                        and photo URL (ImgBB or Google Drive link). All fields validated before submission.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Image Hosting Support:</strong> Accepts ImgBB direct URLs or Google Drive share links. 
+                        System automatically converts Drive links to direct image URLs.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Optional Photos:</strong> Photo URL field is optional. If left empty, platform displays 
+                        beautiful gradient background with 📺 icon as fallback.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Edit Channels:</strong> Update channel information including changing photos. 
+                        Previous photo replaced with new one instantly.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Delete Channels:</strong> Remove channels with confirmation. Complete removal 
+                        from database and platform display.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📱</span>
+                Apps Management
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Add Apps</div>
+                    <div class="feature-description">
+                        Form with app name, features description, download URL, and photo URL. 
+                        Supports multiple download platforms.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Image Support</div>
+                    <div class="feature-description">
+                        ImgBB or Google Drive images. Optional field with 📱 icon fallback. 
+                        Automatic URL conversion for Drive links.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Edit Apps</div>
+                    <div class="feature-description">
+                        Update app details, features, download links, or images. Real-time 
+                        updates across all user interfaces.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Delete Apps</div>
+                    <div class="feature-description">
+                        Remove apps with confirmation dialog. Permanent deletion from 
+                        platform database and displays.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">❓</span>
+                Help Documentation Management
+            </div>
+            <p style="font-size: 15px; line-height: 1.8; color: #4b5563;">
+                Admin can set and update platform help documentation via Firebase PDF URL. Help is accessible 
+                to all users through Account Settings → Help. Only one help document at a time (updates replace 
+                previous version). Perfect for user manuals, FAQs, and platform guides.
+            </p>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 8</div>
+        </div>
+    </div>
+
+    <!-- PAGE 9: TECHNICAL SPECIFICATIONS -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Technical Specifications</div>
+            <div class="page-subtitle">Architecture, security, and performance</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🏗️</span>
+                System Architecture
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Serverless Backend</div>
+                    <div class="feature-description">
+                        Vercel serverless functions with Node.js 24.x. Auto-scaling, 
+                        zero-downtime, and pay-per-use pricing model.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Cloud Database</div>
+                    <div class="feature-description">
+                        MongoDB Atlas with automatic backups, replication, and global 
+                        distribution for low-latency access.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">CDN Integration</div>
+                    <div class="feature-description">
+                        ImgBB for image hosting, Firebase for PDFs. Fast global content 
+                        delivery with edge caching.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">API Architecture</div>
+                    <div class="feature-description">
+                        RESTful API with Express.js routing. JSON responses, CORS enabled, 
+                        and comprehensive error handling.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🔒</span>
+                Security Implementations
+            </div>
+            <ul class="feature-list">
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Authentication:</strong> JWT tokens with 7-day expiration, secure signing with 
+                        HS256 algorithm, and automatic token refresh capability.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Password Security:</strong> bcrypt hashing with 10 salt rounds. Passwords never 
+                        stored in plain text. Secure comparison algorithms prevent timing attacks.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>XSS Protection:</strong> Input sanitization on client and server. HTML escaping 
+                        for all user-generated content. Content Security Policy headers.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>CORS Configuration:</strong> Controlled cross-origin resource sharing. Whitelist 
+                        of allowed origins. Credential handling for authenticated requests.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>MongoDB Security:</strong> Mongoose schema validation prevents injection attacks. 
+                        IP whitelist on Atlas. Database user with limited permissions.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Environment Variables:</strong> All secrets in .env files (not in git). 
+                        Different configs for dev/prod. Vercel environment variable management.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">⚡</span>
+                Performance Optimizations
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Frontend</div>
+                    <div class="feature-description">
+                        Debounced search (300ms), lazy loading, skeleton screens, CSS variables, 
+                        event delegation, and optimized rendering.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Backend</div>
+                    <div class="feature-description">
+                        Connection pooling, cached database connections, indexed queries, 
+                        lean Mongoose queries, and selective field projection.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Database</div>
+                    <div class="feature-description">
+                        Indexes on email, topic names, and dates. Query optimization. 
+                        Efficient aggregation pipelines for complex queries.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Images</div>
+                    <div class="feature-description">
+                        CDN delivery, lazy loading, fallback icons, error handling, and 
+                        automatic Drive URL conversion for optimal loading.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 9</div>
+        </div>
+    </div>
+
+    <!-- PAGE 10: DEPLOYMENT & SCALABILITY -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Deployment & Scalability</div>
+            <div class="page-subtitle">Production-ready cloud infrastructure</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🚀</span>
+                Vercel Serverless Deployment
+            </div>
+            <ul class="feature-list">
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Automatic Scaling:</strong> Functions scale automatically based on demand. 
+                        Handle 1 user or 10,000 users without configuration changes.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Global Edge Network:</strong> Functions deployed to edge locations worldwide. 
+                        Low latency for users regardless of geographic location.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Zero Downtime:</strong> Atomic deployments ensure no downtime. Previous version 
+                        remains active until new deployment succeeds.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Instant Rollbacks:</strong> One-click rollback to any previous deployment. 
+                        Complete deployment history with git integration.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Environment Management:</strong> Separate dev, staging, and production environments. 
+                        Environment variables managed through Vercel dashboard.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📊</span>
+                Scalability Features
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Concurrent Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">Uptime SLA</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">&lt;100ms</div>
+                    <div class="stat-label">API Response Time</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🌍</span>
+                Geographic Distribution
+            </div>
+            <p style="font-size: 15px; line-height: 1.8; color: #4b5563; margin-bottom: 20px;">
+                Platform deployed across multiple regions ensuring low-latency access for users worldwide. 
+                MongoDB Atlas provides multi-region replication, Vercel edge functions serve from nearest 
+                location, and ImgBB CDN delivers images from global edge servers.
+            </p>
+        </div>
+
+        <div class="highlight-box">
+            <div class="highlight-title">💰 Cost-Effective Infrastructure</div>
+            <div style="margin-top: 15px; font-size: 15px; line-height: 1.8;">
+                <p style="margin-bottom: 12px;">
+                    <strong>Pay-Per-Use Model:</strong> Only pay for actual usage. No idle server costs. 
+                    Vercel's serverless model means $0 cost when platform is not being used.
+                </p>
+                <p style="margin-bottom: 12px;">
+                    <strong>Free Tiers:</strong> MongoDB Atlas (512MB free), Vercel (100GB bandwidth free), 
+                    Firebase Storage (5GB free), ImgBB (unlimited free image hosting).
+                </p>
+                <p>
+                    <strong>Predictable Scaling Costs:</strong> Linear cost increase with usage. No sudden 
+                    spikes or unexpected bills. Complete cost transparency through dashboards.
+                </p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📈</span>
+                Future Scalability
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Redis Caching</div>
+                    <div class="feature-description">
+                        Can add Redis layer for frequently accessed data. Reduce database 
+                        queries and improve response times further.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Load Balancing</div>
+                    <div class="feature-description">
+                        Automatic load distribution across servers. No single point of 
+                        failure. Graceful degradation under high load.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Microservices</div>
+                    <div class="feature-description">
+                        Can split into separate services for auth, quiz, content. Independent 
+                        scaling and deployment of each service.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">GraphQL API</div>
+                    <div class="feature-description">
+                        Potential GraphQL layer for efficient data fetching. Reduce over-fetching 
+                        and multiple round trips.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 10</div>
+        </div>
+    </div>
+
+    <!-- PAGE 11: USER EXPERIENCE HIGHLIGHTS -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">User Experience Excellence</div>
+            <div class="page-subtitle">Design, accessibility, and usability</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🎨</span>
+                Visual Design Language
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Modern Aesthetics</div>
+                    <div class="feature-description">
+                        Clean, minimalist design with ample whitespace. Purple gradient theme 
+                        (#667eea to #764ba2) creates professional, educational atmosphere.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Consistent Branding</div>
+                    <div class="feature-description">
+                        Unified color palette, typography (Inter font), and component styling 
+                        across all pages for cohesive experience.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Micro-Interactions</div>
+                    <div class="feature-description">
+                        Subtle hover effects, smooth transitions, ripple effects on buttons, 
+                        and animated loading states enhance engagement.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Visual Hierarchy</div>
+                    <div class="feature-description">
+                        Clear content prioritization with size, color, and spacing. Users 
+                        naturally focus on important elements first.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">♿</span>
+                Accessibility Features
+            </div>
+            <ul class="feature-list">
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Keyboard Navigation:</strong> Full platform navigation using Tab, Enter, Escape keys. 
+                        Focus indicators on all interactive elements. Skip to content links.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>ARIA Labels:</strong> Comprehensive aria-label attributes for screen readers. 
+                        Semantic HTML5 elements. Proper heading hierarchy.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Color Contrast:</strong> WCAG AA compliant contrast ratios. Text readable in both 
+                        light and dark themes. No reliance on color alone for information.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Focus Management:</strong> Logical tab order. Focus trapped in modals. Automatic 
+                        focus on form fields. Clear focus outlines.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Responsive Text:</strong> Scalable font sizes with clamp(). Readable on all screen 
+                        sizes. Proper line height (1.6-1.8) for readability.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📱</span>
+                Mobile Experience
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Touch-Optimized</div>
+                    <div class="feature-description">
+                        Large touch targets (min 44x44px). Swipe gestures supported. No hover-dependent 
+                        features. Thumb-friendly layout.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Responsive Grid</div>
+                    <div class="feature-description">
+                        CSS Grid and Flexbox adapt to any screen size. Single column on mobile, 
+                        multi-column on desktop. Fluid typography.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Performance</div>
+                    <div class="feature-description">
+                        Optimized for mobile networks. Lazy loading images. Minimal JavaScript. 
+                        Fast Time to Interactive (TTI).
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Mobile Navigation</div>
+                    <div class="feature-description">
+                        Hamburger menu on small screens. Collapsible sections. Easy scrolling. 
+                        Fixed header for quick access.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <div class="highlight-title">🌟 Usability Principles Applied</div>
+            <div style="margin-top: 15px; font-size: 14px; line-height: 1.7;">
+                <p style="margin-bottom: 10px;"><strong>✓ Discoverability:</strong> All features easily found through clear navigation and labeled buttons</p>
+                <p style="margin-bottom: 10px;"><strong>✓ Feedback:</strong> Every action receives immediate visual/textual confirmation</p>
+                <p style="margin-bottom: 10px;"><strong>✓ Error Prevention:</strong> Validation before submission, confirmation dialogs for destructive actions</p>
+                <p style="margin-bottom: 10px;"><strong>✓ Consistency:</strong> Same patterns repeated throughout platform (cards, forms, buttons)</p>
+                <p style="margin-bottom: 10px;"><strong>✓ Recognition over Recall:</strong> Icons, labels, and visual cues reduce memory load</p>
+                <p><strong>✓ Flexibility:</strong> Multiple ways to accomplish tasks (keyboard, mouse, touch)</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 11</div>
+        </div>
+    </div>
+
+    <!-- PAGE 12: INTEGRATION & EXTENSIBILITY -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Integration & Extensibility</div>
+            <div class="page-subtitle">Third-party services and future enhancements</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🔗</span>
+                Current Integrations
+            </div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Purpose</th>
+                        <th>Benefits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>MongoDB Atlas</strong></td>
+                        <td>Primary database</td>
+                        <td>Auto-scaling, backups, global distribution</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vercel</strong></td>
+                        <td>Hosting & deployment</td>
+                        <td>Serverless functions, edge network, CI/CD</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Firebase Storage</strong></td>
+                        <td>PDF file hosting</td>
+                        <td>Secure storage, CDN delivery, scalability</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ImgBB</strong></td>
+                        <td>Image hosting</td>
+                        <td>Free unlimited storage, fast CDN, reliable</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Google Drive</strong></td>
+                        <td>Alternative image host</td>
+                        <td>Familiar interface, easy sharing, free storage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🚀</span>
+                Potential Future Enhancements
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">🏆 Gamification</div>
+                    <div class="feature-description">
+                        Badges, achievements, leaderboards, streak tracking, point systems, 
+                        and challenges to increase engagement.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">📊 Analytics Dashboard</div>
+                    <div class="feature-description">
+                        User progress charts, quiz performance analytics, topic mastery tracking, 
+                        and personalized recommendations.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">👥 Social Features</div>
+                    <div class="feature-description">
+                        Study groups, peer challenges, discussion forums, content sharing, 
+                        and collaborative learning.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">📧 Email Notifications</div>
+                    <div class="feature-description">
+                        Daily quiz reminders, weekly progress reports, new content alerts, 
+                        and achievement notifications.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">🌐 Internationalization</div>
+                    <div class="feature-description">
+                        Multi-language support, localized content, RTL text support, 
+                        and cultural adaptations.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">📱 Mobile Apps</div>
+                    <div class="feature-description">
+                        Native iOS and Android apps with offline support, push notifications, 
+                        and platform-specific features.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">🎓 Certificates</div>
+                    <div class="feature-description">
+                        Completion certificates, course badges, downloadable PDFs, 
+                        and LinkedIn integration.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">🤖 AI Integration</div>
+                    <div class="feature-description">
+                        AI-powered question generation, personalized learning paths, 
+                        smart recommendations, and tutoring.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🔌</span>
+                API Extensibility
+            </div>
+            <p style="font-size: 15px; line-height: 1.8; color: #4b5563; margin-bottom: 15px;">
+                Platform built with RESTful API architecture allows easy integration with external services:
+            </p>
+            <ul class="feature-list">
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div><strong>LMS Integration:</strong> Can integrate with Moodle, Canvas, or Blackboard</div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div><strong>Single Sign-On:</strong> OAuth2, SAML, or institutional authentication</div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div><strong>Third-Party Content:</strong> YouTube API, academic databases, external quizzes</div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div><strong>Analytics Tools:</strong> Google Analytics, Mixpanel, Amplitude integration</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 12</div>
+        </div>
+    </div>
+
+    <!-- PAGE 13: CONCLUSION & CONTACT -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Platform Summary</div>
+            <div class="page-subtitle">Complete feature overview and next steps</div>
+        </div>
+
+        <div class="highlight-box" style="margin-bottom: 30px;">
+            <div class="highlight-title">🎯 Why Choose ZETA?</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 20px; font-size: 14px;">
+                <div>
+                    <h4 style="font-size: 16px; margin-bottom: 12px; font-weight: 600;">For Students</h4>
+                    <ul style="line-height: 1.8; padding-left: 20px;">
+                        <li>Interactive learning experience</li>
+                        <li>Self-paced education</li>
+                        <li>Progress tracking & motivation</li>
+                        <li>Access anywhere, anytime</li>
+                        <li>Free educational resources</li>
+                        <li>Engaging quiz formats</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="font-size: 16px; margin-bottom: 12px; font-weight: 600;">For Educators</h4>
+                    <ul style="line-height: 1.8; padding-left: 20px;">
+                        <li>Easy content management</li>
+                        <li>Bulk import for efficiency</li>
+                        <li>Real-time updates</li>
+                        <li>Scalable infrastructure</li>
+                        <li>No technical expertise needed</li>
+                        <li>Complete administrative control</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📊</span>
+                Platform Statistics
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Quiz Systems</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Content Categories</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">Technology Stack</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Serverless</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Scalability</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Availability</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">✨</span>
+                Key Differentiators
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Dual Quiz System</div>
+                    <div class="feature-description">
+                        Unique combination of daily and competitive formats keeps students 
+                        engaged with varied learning approaches.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Bulk CSV Import</div>
+                    <div class="feature-description">
+                        Revolutionary time-saving feature allows adding 100+ questions in 
+                        seconds - unique in education platforms.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Serverless Architecture</div>
+                    <div class="feature-description">
+                        Modern cloud infrastructure ensures infinite scalability without 
+                        traditional server management overhead.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">All-in-One Platform</div>
+                    <div class="feature-description">
+                        Combines quizzes, papers, videos, and apps in single unified 
+                        platform - no need for multiple tools.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📞</span>
+                Get Started
+            </div>
+            <div style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 30px; border-radius: 12px; border-left: 4px solid #667eea;">
+                <h4 style="font-size: 18px; margin-bottom: 15px; color: #667eea; font-weight: 700;">Contact Information</h4>
+                <p style="font-size: 15px; line-height: 1.8; color: #4b5563; margin-bottom: 10px;">
+                    <strong>Email:</strong> info@zeta.com
+                </p>
+                <p style="font-size: 15px; line-height: 1.8; color: #4b5563; margin-bottom: 10px;">
+                    <strong>Developer:</strong> Vivek Gundu (Navodayan)
+                </p>
+                <p style="font-size: 15px; line-height: 1.8; color: #4b5563; margin-bottom: 10px;">
+                    <strong>Platform:</strong> Available 24/7 at ZETA Science Platform
+                </p>
+                <p style="font-size: 15px; line-height: 1.8; color: #4b5563;">
+                    <strong>Documentation:</strong> Complete setup guide and API documentation included
+                </p>
+            </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 12px; text-align: center; margin-top: 40px;">
+            <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 15px;">Ready to Transform Science Education?</h3>
+            <p style="font-size: 16px; line-height: 1.7; margin-bottom: 25px; opacity: 0.95;">
+                ZETA Platform provides everything needed for modern, engaging, and effective science learning. 
+                From interactive quizzes to comprehensive resource libraries, we've built a complete solution 
+                for educational excellence.
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <div style="background: rgba(255,255,255,0.2); padding: 15px 25px; border-radius: 8px; backdrop-filter: blur(10px);">
+                    <div style="font-size: 14px; font-weight: 600;">Enterprise-Grade</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 15px 25px; border-radius: 8px; backdrop-filter: blur(10px);">
+                    <div style="font-size: 14px; font-weight: 600;">Cloud-Native</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 15px 25px; border-radius: 8px; backdrop-filter: blur(10px);">
+                    <div style="font-size: 14px; font-weight: 600;">Future-Ready</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 13 - Final</div>
+        </div>
+    </div>
+
+    <script>
+        // Print functionality
+        window.onload = function() {
+            // Auto-print dialog (optional - comment out if not needed)
+            // setTimeout(() => window.print(), 1000);
+        };
+        
+        // Add print button
+        const printBtn = document.createElement('button');
+        printBtn.textContent = '🖨️ Print/Save as PDF';
+        printBtn.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 9999;
+            font-size: 14px;
+        `;
+        printBtn.onclick = () => window.print();
+        document.body.appendChild(printBtn);
+        
+        // Hide print button when printing
+        window.onbeforeprint = () => printBtn.style.display = 'none';
+        window.onafterprint = () => printBtn.style.display = 'block';
+    </script>
+</body>
+</html>page-title">Platform Overview</div>
+            <div class="page-subtitle">Enterprise-grade science education solution</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🎯</span>
+                Core Mission
+            </div>
+            <p style="font-size: 15px; line-height: 1.8; color: #4b5563; margin-bottom: 20px;">
+                ZETA is designed to revolutionize science education by providing an all-in-one platform 
+                that combines interactive learning, comprehensive resources, and seamless content management. 
+                Our platform empowers educators and students with cutting-edge tools for effective learning.
+            </p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">2</div>
+                <div class="stat-label">Quiz Systems</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Content Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Serverless</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🏗️</span>
+                Technical Architecture
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Frontend Layer</div>
+                    <div class="feature-description">
+                        Modern HTML5/CSS3/JavaScript with responsive design, theme switching, 
+                        and progressive enhancement for optimal user experience.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Backend Layer</div>
+                    <div class="feature-description">
+                        Node.js serverless functions on Vercel with Express.js framework, 
+                        providing auto-scaling and zero-downtime deployments.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Database Layer</div>
+                    <div class="feature-description">
+                        MongoDB Atlas cloud database with automatic backups, replication, 
+                        and optimized queries for high performance.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Security Layer</div>
+                    <div class="feature-description">
+                        JWT authentication, bcrypt password hashing, CORS protection, 
+                        and XSS prevention for enterprise-grade security.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">⚡</span>
+                Technology Stack
+            </div>
+            <div class="tech-stack">
+                <span class="tech-badge">Node.js 24.x</span>
+                <span class="tech-badge">Express.js</span>
+                <span class="tech-badge">MongoDB Atlas</span>
+                <span class="tech-badge">Vercel Serverless</span>
+                <span class="tech-badge">JWT Auth</span>
+                <span class="tech-badge">Firebase Storage</span>
+                <span class="tech-badge">ImgBB CDN</span>
+                <span class="tech-badge">Mongoose ODM</span>
+                <span class="tech-badge">bcrypt.js</span>
+                <span class="tech-badge">Responsive Design</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 1</div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: USER INTERFACE -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">User Interface Features</div>
+            <div class="page-subtitle">Student-facing platform capabilities</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🎨</span>
+                Design System
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">🌓 Theme Switching</div>
+                    <div class="feature-description">
+                        Beautiful light and dark themes with smooth transitions. User preference 
+                        is saved and persists across sessions.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">📱 Responsive Design</div>
+                    <div class="feature-description">
+                        Mobile-first approach ensuring perfect display on all devices - 
+                        desktop, tablet, and mobile phones.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">♿ Accessibility</div>
+                    <div class="feature-description">
+                        ARIA labels, keyboard navigation, focus indicators, and screen reader 
+                        support for inclusive access.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">⚡ Performance</div>
+                    <div class="feature-description">
+                        Debounced search, lazy loading, skeleton screens, and optimized 
+                        rendering for fast interactions.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">👤</span>
+                User Experience Flow
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Welcome Screen</h4>
+                    <p>Personalized greeting with platform features overview and smooth onboarding experience.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>Main Dashboard</h4>
+                    <p>Clean, organized interface with easy navigation to all platform sections and features.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>Interactive Content</h4>
+                    <p>Engage with quizzes, papers, channels, and apps through intuitive card-based layouts.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>Progress Tracking</h4>
+                    <p>Visual indicators show completion status and learning progress across all activities.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <div class="highlight-title">🎯 User-Centric Design Principles</div>
+            <ul class="feature-list" style="color: white; margin-top: 15px;">
+                <li style="border-bottom-color: rgba(255,255,255,0.2);">
+                    <span class="checkmark" style="color: #fbbf24;">✓</span>
+                    <span>Intuitive navigation with clear visual hierarchy and logical flow</span>
+                </li>
+                <li style="border-bottom-color: rgba(255,255,255,0.2);">
+                    <span class="checkmark" style="color: #fbbf24;">✓</span>
+                    <span>Consistent design language across all pages and components</span>
+                </li>
+                <li style="border-bottom-color: rgba(255,255,255,0.2);">
+                    <span class="checkmark" style="color: #fbbf24;">✓</span>
+                    <span>Instant feedback with toast notifications and visual confirmations</span>
+                </li>
+                <li style="border-bottom: none;">
+                    <span class="checkmark" style="color: #fbbf24;">✓</span>
+                    <span>Smooth animations and transitions for delightful interactions</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 2</div>
+        </div>
+    </div>
+
+    <!-- PAGE 3: AUTHENTICATION SYSTEM -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Authentication System</div>
+            <div class="page-subtitle">Secure user management and access control</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🔐</span>
+                Security Features
+            </div>
+            <ul class="feature-list">
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>JWT Token Authentication:</strong> 7-day token expiration with secure signing algorithm. 
+                        Tokens stored in localStorage with automatic refresh capability.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Password Security:</strong> bcrypt hashing with 10 salt rounds. Minimum 6 character requirement 
+                        with real-time strength indicator showing weak/fair/strong levels.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Security Questions:</strong> Multiple choice security questions with hashed answers 
+                        for account recovery without email verification.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Input Validation:</strong> Client and server-side validation with XSS protection, 
+                        SQL injection prevention, and sanitized inputs.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Session Management:</strong> Automatic logout on token expiration, secure session handling, 
+                        and persistent login across browser sessions.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📝</span>
+                User Registration Flow
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">Step 1: Sign Up</div>
+                    <div class="feature-description">
+                        Full name, email, password (with confirmation), security question selection, 
+                        and security answer. Real-time password strength indicator.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Step 2: Validation</div>
+                    <div class="feature-description">
+                        Email format validation, password strength check, duplicate email detection, 
+                        and security answer verification.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Step 3: Account Creation</div>
+                    <div class="feature-description">
+                        Secure password hashing, database record creation, automatic data sanitization, 
+                        and immediate login readiness.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Step 4: Login</div>
+                    <div class="feature-description">
+                        JWT token generation, user data retrieval, session initialization, 
+                        and redirect to personalized dashboard.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🔄</span>
+                Password Recovery System
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Email Verification</h4>
+                    <p>User enters registered email. System validates and retrieves security question.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>Security Question</h4>
+                    <p>Display user's chosen security question. User provides answer for verification.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>Answer Validation</h4>
+                    <p>System compares hashed answer. Access granted only if answer matches exactly.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>Password Reset</h4>
+                    <p>User creates new password. System hashes and updates. Immediate login available.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 3</div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: QUIZ SYSTEM -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Dual Quiz System</div>
+            <div class="page-subtitle">Daily challenges and competitive learning</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📝</span>
+                Daily Quiz Features
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">One Question Daily</div>
+                    <div class="feature-description">
+                        Single carefully curated question each day to encourage consistent learning 
+                        habits and daily platform engagement.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Instant Feedback</div>
+                    <div class="feature-description">
+                        Immediate correct/incorrect indication with visual green (correct) or 
+                        red (incorrect) highlighting on selected option.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">Answer Persistence</div>
+                    <div class="feature-description">
+                        Your answer is saved permanently. Revisiting shows your previous selection 
+                        with correct answer highlighted.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-title">No Re-submission</div>
+                    <div class="feature-description">
+                        Once answered, the question is locked to maintain integrity and prevent 
+                        answer changing after seeing results.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🏆</span>
+                Competitive Quiz Features
+            </div>
+            <ul class="feature-list">
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Topic-Based Organization:</strong> Multiple topics (Chemistry, Physics, Biology, etc.) 
+                        with unlimited questions per topic for comprehensive coverage.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Progress Tracking:</strong> Visual progress bar showing "X/Y Questions Attempted" 
+                        with real-time updates as you answer questions.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Question Numbering:</strong> Clear numbering system (Question 1, Question 2, etc.) 
+                        for easy navigation and reference within topics.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Unlimited Attempts:</strong> No restriction on number of questions. Students can 
+                        answer as many questions as available in each topic.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Answer Persistence:</strong> All answers saved across sessions. Return anytime 
+                        to see your previous answers and correct solutions.
+                    </div>
+                </li>
+                <li>
+                    <span class="checkmark">✓</span>
+                    <div>
+                        <strong>Topic Navigation:</strong> Easy back-to-topics button for seamless switching 
+                        between different subject areas without losing progress.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="highlight-box">
+            <div class="highlight-title">🎓 Educational Benefits</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <div>
+                    <h4 style="font-size: 16px; margin-bottom: 10px; font-weight: 600;">Daily Quiz</h4>
+                    <ul style="font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                        <li>Builds consistent learning habits</li>
+                        <li>Low-pressure single question format</li>
+                        <li>Encourages daily engagement</li>
+                        <li>Varied topics for broad knowledge</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="font-size: 16px; margin-bottom: 10px; font-weight: 600;">Competitive Quiz</h4>
+                    <ul style="font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                        <li>Deep topic mastery through repetition</li>
+                        <li>Self-paced learning at student's comfort</li>
+                        <li>Progress tracking motivates completion</li>
+                        <li>Comprehensive subject coverage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>ZETA Platform Features</div>
+            <div>Page 4</div>
+        </div>
+    </div>
+
+    <!-- PAGE 5: CONTENT MANAGEMENT -->
+    <div class="page content-page">
+        <div class="page-header">
+            <div class="page-title">Content Library</div>
+            <div class="page-subtitle">Research papers, channels, and apps</div>
+        </div>

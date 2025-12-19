@@ -1,0 +1,39 @@
+# Ignore everything by default
+*
+
+# Allow specific directories
+!backend/
+!frontend/
+
+# Ignore within allowed directories
+backend/node_modules
+backend/.env
+backend/tests
+backend/coverage
+backend/*.md
+
+frontend/node_modules
+frontend/.env
+frontend/tests
+frontend/coverage
+frontend/*.md
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Development files
+.git
+.gitignore
+.github/
+.vscode/
+.idea/
+
+# CI/CD
+.travis.yml
+.circleci/
+
+# OS files
+.DS_Store
+Thumbs.db
