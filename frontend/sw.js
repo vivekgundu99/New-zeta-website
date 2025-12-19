@@ -11,7 +11,8 @@ const urlsToCache = [
   '/admin.js',
   '/config.js',
   '/js/state-manager.js',
-  '/js/api-client.js'
+  '/js/api-client.js',
+  '/js/notifications.js'
 ];
 
 // Install event - cache resources

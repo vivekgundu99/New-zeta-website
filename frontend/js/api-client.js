@@ -194,7 +194,9 @@ api.addRequestInterceptor((config) => {
 // Response error interceptor
 api.addResponseInterceptor(async (response) => {
     if (response.status === 401) {
-        store.setState({ user: null, token: null });
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('theme');
         window.location.href = '/login.html';
         throw new APIError('Session expired', 401);
     }

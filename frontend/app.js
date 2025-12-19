@@ -800,29 +800,53 @@ async function answerQuestion(questionId, answer, type, startTime) {
         
         showMessage('Submitting answer...', 'info');
         
-        const response = await api.post('/quiz/answer', {
-            questionId,
-            answer,
-            type,
-            timeTaken
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showMessage('Session expired. Please login again.', 'error');
+            setTimeout(() => window.location.href = 'login.html', 1500);
+            return;
+        }
+        
+        const response = await fetch(`${API_URL}/quiz/answer`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                questionId,
+                answer,
+                type,
+                timeTaken
+            })
         });
 
-        if (response) {
+        if (response.status === 401) {
+            showMessage('Session expired. Please login again.', 'error');
+            localStorage.clear();
+            setTimeout(() => window.location.href = 'login.html', 1500);
+            return;
+        }
+
+        const data = await response.json();
+
+        if (response.ok) {
             showMessage('Answer submitted successfully!', 'success');
             
+            // Reload appropriate section
             if (type === 'daily') {
                 await loadDailyQuiz();
             } else if (type === 'competitive') {
                 if (currentTopicId && currentTopicName) {
                     await loadTopicQuestions(currentTopicId, currentTopicName);
-                } else {
-                    await loadCompetitiveQuiz();
                 }
             }
+        } else {
+            showMessage(data.message || 'Failed to submit answer', 'error');
         }
     } catch (error) {
         console.error('Error submitting answer:', error);
-        showMessage(error.message || 'Error submitting answer', 'error');
+        showMessage('Network error. Please try again.', 'error');
     }
 }
 // Display All Papers

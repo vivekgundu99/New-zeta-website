@@ -520,7 +520,18 @@
         async function loadAnalytics() {
             try {
                 // Load user analytics
-                const data = await api.get('/analytics/user');
+                try {
+                    const data = await api.get('/analytics/user');
+                    // ... rest of code
+                } catch (error) {
+                    console.error('Failed to load analytics:', error);
+                    if (error.status === 401) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    } else {
+                        showError(error.message || 'Failed to load analytics data');
+                    }
+                }
                 
                 // Update stats
                 document.getElementById('accuracyStat').textContent = `${data.accuracy}%`;
